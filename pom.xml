@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.4.RELEASE</version>
+    </parent>
+
+    <groupId>com.perfect.bcs</groupId>
+    <artifactId>bcs-parent</artifactId>
+    <name>${project.artifactId}</name>
+
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>web</module>
+        <module>biz</module>
+        <module>dal</module>
+    </modules>
+
+
+    <properties>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
+        <shared.version>2.0.18</shared.version>
+    </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <!--一方库-->
+        
+            <dependency>
+                <groupId>com.perfect.bcs</groupId>
+                <artifactId>bcs-dal</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.perfect.bcs</groupId>
+                <artifactId>bcs-biz</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.perfect.bcs</groupId>
+                <artifactId>bcs-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!--二方库-->
+            <dependency>
+                <groupId>com.shuhong</groupId>
+                <artifactId>common-shared-weixin-utils</artifactId>
+                <version>${shared.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.shuhong</groupId>
+                <artifactId>common-shared-web-utils</artifactId>
+                <version>${shared.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.shuhong</groupId>
+                <artifactId>common-shared-system-utils</artifactId>
+                <version>${shared.version}</version>
+            </dependency>
+
+            <!--三方库-->
+            <!-- 支持多数据源 Oracle -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <version>3.2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>3.17.3</version> <!-- 选择最新兼容版本 -->
+            </dependency>
+            <!-- 支持多数据源 SQL Server -->
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>sqljdbc4</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <!--苞米豆 mybatis plus-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>3.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>3.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>2.3.29</version>
+            </dependency>
+
+            <!--druid 连接池依赖 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>1.2.15</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.62</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>28.0-jre</version>
+            </dependency>
+
+            <!-- javax mail -->
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4.7</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>javax.mail-api</artifactId>
+                <version>1.4.7</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>1.6</version>
+            </dependency>
+            <dependency>
+                <groupId>dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+
+            <!--joda-->
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.9.9</version>
+            </dependency>
+
+
+            <!-- jedis redis-->
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>2.8.1</version>
+            </dependency>
+
+            <!--Test-->
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>7.1.1</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- okhttp-->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>3.9.1</version>
+            </dependency>
+
+            <!--oss-->
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>3.9.1</version>
+            </dependency>
+
+            <!--jdom-->
+            <dependency>
+                <groupId>org.jdom</groupId>
+                <artifactId>jdom</artifactId>
+                <version>1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.13</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.30</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>4.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>4.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>1.12.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.qcloudsms</groupId>
+                <artifactId>qcloudsms</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+
+            <!--swagger UI-->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-spring-boot-starter</artifactId>
+                <version>2.0.8</version>
+            </dependency>
+
+
+            <!--Hutool是一个小而全的Java工具类库-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>5.7.7</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>1.7.2</version>
+            </dependency>
+
+            <!-- 支持多数据源 postgresql -->
+            <dependency>
+                <artifactId>postgresql</artifactId>
+                <groupId>org.postgresql</groupId>
+                <version>42.2.16</version>
+            </dependency>
+
+            <!-- Oracle -->
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>11.2.0.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+                <version>3.2.9</version>
+            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>com.sun.xml.bind</groupId>-->
+            <!--                <artifactId>jaxb-xjc</artifactId>-->
+            <!--                <version>2.1.13</version>-->
+            <!--            </dependency>-->
+
+            <dependency>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

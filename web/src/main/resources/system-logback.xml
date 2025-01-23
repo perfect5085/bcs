@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProperty scope="context" name="LOG_LEVEL" source="logging.pattern.level"/>
+
+    <!-- 活动文件的大小 -->
+    <property name="max.file.size" value="500MB"/>
+    <!-- 保留的归档文件的最大数量 -->
+    <property name="max.history" value="7"/>
+    <!-- 控制所有归档日志文件的总大小 -->
+    <property name="total.size.cap" value="30GB"/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${LOG_LEVEL}</level>
+        </filter>
+    </appender>
+
+    <!-- Plain Text Rolling Appender -->
+    <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Append>true</Append>
+        <File>${LOG_PATH}/system-info.log</File>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/system-info.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>${max.file.size}</maxFileSize>
+            <maxHistory>${max.history}</maxHistory>
+            <totalSizeCap>${total.size.cap}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Plain Text Rolling Appender -->
+    <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Append>true</Append>
+        <File>${LOG_PATH}/system-error.log</File>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/system-error.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>${max.file.size}</maxFileSize>
+            <maxHistory>${max.history}</maxHistory>
+            <totalSizeCap>${total.size.cap}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="bizError" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Append>true</Append>
+        <File>${LOG_PATH}/biz-error.log</File>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/biz-error.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>${max.file.size}</maxFileSize>
+            <maxHistory>${max.history}</maxHistory>
+            <totalSizeCap>${total.size.cap}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!--spring-->
+    <logger name="org.springframework" level="info">
+        <appender-ref ref="info"/>
+    </logger>
+
+    <logger name="bizErrorLogger">
+        <appender-ref ref="bizError"/>
+    </logger>
+
+    <!--root-->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="console"/>
+        <appender-ref ref="error"/>
+        <appender-ref ref="info"/>
+    </root>
+</configuration>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+
+    <!--系统异常，前端需要做特殊处理-->
+    <entry key="-1">系统内部出现异常，请前端友好提示用户，具体异常信息参考errorMessage。</entry>
+    <entry key="-10">没有权限调用该接口或者访问该页面，很可能未登录或者登录信息过期或者越权访问。</entry>
+
+
+    <!--业务异常，前端提示用户-->
+    <entry key="1000">账户 {} 不存在，请进一步确认账号是否正确！</entry>
+    <entry key="1001">账户 {} 状态不正常，无法进行操作！</entry>
+    <entry key="1002">系统繁忙，请等待10分钟之后再进行操作！</entry>
+    <entry key="1003">账户 {} 的余额不够，无法进行操作！</entry>
+    <entry key="1004">交易 {} 的已经执行或者正在执行，请勿重复提交！</entry>
+
+
+</properties>
