@@ -12,9 +12,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
  * @author liangbo 梁波
- * @date 2020-05-01 16:48
+ * @date 2025-01-22 22:37
  */
-@RestControllerAdvice(basePackages = {"com.tianda.dds.web.controller"})
+@RestControllerAdvice(basePackages = {"com.perfect.bcs.web.controller"})
 public class GlobalRestControllerHandler implements ResponseBodyAdvice<Object> {
 
     @Override

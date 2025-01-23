@@ -2,6 +2,7 @@ package com.perfect.bcs.biz;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.perfect.bcs.biz.type.AccountStatus;
 import com.perfect.bcs.dal.domain.AccountInfoDO;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -40,11 +41,21 @@ public class DataGeneratorService {
                 String accountNo = BANK_CODE + accountLong;
                 BigDecimal balance = RandomUtil.randomBigDecimal(BigDecimal.ZERO, new BigDecimal("1000000.00"));
 
+                int statusInt = RandomUtil.randomInt(0, 100);
+                String status = AccountStatus.ACTIVE;
+                if (1 == statusInt) {
+                    status = AccountStatus.FROZEN;
+                }
+                if (2 == statusInt) {
+                    status = AccountStatus.INACTIVE;
+                }
+
                 AccountInfoDO accountInfoDO = new AccountInfoDO()
                         .setAccountNo(accountNo)
                         .setAccountName(MockDataUtil.getName())
                         .setAccountBalance(balance)
                         .setAccountNote("")
+                        .setAccountStatus(status)
                         .setDataVersion(IdUtil.fastSimpleUUID());
                 accountList.add(accountInfoDO);
             }

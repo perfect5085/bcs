@@ -9,8 +9,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
- * @authoror 梁波
- * @since 2016-07-19
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
  */
 @Component
 public class CrossDomainInterceptor extends HandlerInterceptorAdapter {

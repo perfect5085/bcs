@@ -4,6 +4,10 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import org.apache.commons.lang3.RandomUtils;
 
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
 public class MockDataUtil {
 
     /**

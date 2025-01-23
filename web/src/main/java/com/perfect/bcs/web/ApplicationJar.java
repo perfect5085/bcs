@@ -15,9 +15,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author liangbo 梁波
- * @since 2016-08-15 16:55
+ * @date 2025-01-22 22:37
  */
-@SpringBootApplication(scanBasePackages = "com.tianda.dds", exclude = DruidDataSourceAutoConfigure.class)
+@SpringBootApplication(scanBasePackages = "com.perfect.bcs", exclude = DruidDataSourceAutoConfigure.class)
 @ServletComponentScan
 @EnableCaching
 @EnableScheduling

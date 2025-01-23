@@ -20,7 +20,7 @@
             <groupId>com.perfect.bcs</groupId>
             <artifactId>bcs-biz</artifactId>
         </dependency>
-        <!--二方库-->
+
         <dependency>
             <groupId>com.shuhong</groupId>
             <artifactId>common-shared-web-utils</artifactId>

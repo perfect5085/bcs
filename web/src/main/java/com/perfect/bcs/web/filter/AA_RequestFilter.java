@@ -13,10 +13,8 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Filter的执行顺序由Java文件的名字升序排序
- *
  * @author liangbo 梁波
- * @since 2016-08-18 15:52
+ * @date 2025-01-22 22:37
  */
 @WebFilter(urlPatterns = "/*")
 public class AA_RequestFilter implements Filter {

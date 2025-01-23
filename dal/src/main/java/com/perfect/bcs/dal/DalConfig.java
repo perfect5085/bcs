@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author liangbo 梁波
- * @date 2020-02-03 12:53
+ * @date 2025-01-22 22:37
  */
 @Configuration
 @MapperScan({ "com.perfect.bcs.dal" })

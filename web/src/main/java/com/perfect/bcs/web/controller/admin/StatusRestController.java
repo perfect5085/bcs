@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author liangbo 梁波
- * @since 2016-08-15 17:15
+ * @date 2025-01-22 22:37
  */
 @RestController
 @RequestMapping(value = "/open/status/", produces = "application/json")

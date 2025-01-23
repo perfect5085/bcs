@@ -6,6 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
 @Slf4j
 public class CommonController {
 

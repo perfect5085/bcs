@@ -1,6 +1,5 @@
 package com.perfect.bcs.web;
 
-
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,12 +24,11 @@ import org.springframework.stereotype.Component;
  * 自定义环境处理，在运行SpringApplication之前加载任意配置文件到Environment环境中
  *
  * @author liangbo 梁波
- * @date 2021-12-09 17:40
+ * @date 2025-01-22 22:37
  */
 @Slf4j
 @Component
 public class MyEnvironmentPostProcessor implements EnvironmentPostProcessor {
-
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -47,7 +45,7 @@ public class MyEnvironmentPostProcessor implements EnvironmentPostProcessor {
             Resource resource = resourceMap.get(profile);
             //加载成PropertySource对象，并添加到Environment环境中
             environment.getPropertySources()
-                .addLast(loadProfiles(resource));
+                       .addLast(loadProfiles(resource));
         }
     }
 
@@ -87,7 +85,6 @@ public class MyEnvironmentPostProcessor implements EnvironmentPostProcessor {
         return profileList;
     }
 
-
     /**
      * 从 profile 文件夹中读取所有的配置文件
      *
@@ -105,8 +102,8 @@ public class MyEnvironmentPostProcessor implements EnvironmentPostProcessor {
                 String fileName = resource.getFilename();
                 // 查找出： properties yml 的文件
                 if (StrUtil.endWith(fileName, ".properties")
-                    || StrUtil.endWith(fileName, ".yml")
-                    || StrUtil.endWith(fileName, ".yaml")) {
+                        || StrUtil.endWith(fileName, ".yml")
+                        || StrUtil.endWith(fileName, ".yaml")) {
 
                     // 解析 profile 的名称
                     // 1 移除前缀

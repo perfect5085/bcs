@@ -19,11 +19,6 @@
             <groupId>com.perfect.bcs</groupId>
             <artifactId>bcs-dal</artifactId>
         </dependency>
-        <!--二方库-->
-        <dependency>
-            <groupId>com.shuhong</groupId>
-            <artifactId>common-shared-weixin-utils</artifactId>
-        </dependency>
 
         <!--三方库-->
         <dependency>

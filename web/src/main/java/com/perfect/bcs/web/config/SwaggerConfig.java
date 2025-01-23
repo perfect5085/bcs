@@ -20,8 +20,8 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 
 /**
- * @authoror liangbo 梁波
- * @date 2017-12-13 10:38
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
  */
 @Configuration
 @EnableSwagger2WebMvc
@@ -51,7 +51,7 @@ public class SwaggerConfig {
 
         ApiSelectorBuilder apiSelectorBuilder = docket.select();
         apiSelectorBuilder.apis(predicate);
-        apiSelectorBuilder.apis(RequestHandlerSelectors.basePackage("com.tianda.dds.web"));
+        apiSelectorBuilder.apis(RequestHandlerSelectors.basePackage("com.perfect.bcs.web"));
         apiSelectorBuilder.paths(PathSelectors.any());
 
         return apiSelectorBuilder.build();
@@ -65,7 +65,7 @@ public class SwaggerConfig {
             .title("接口")
             // 描述
             .description("接口文档")
-            .termsOfServiceUrl("https://www.tiandaai.com").
+            .termsOfServiceUrl("https://www.perfect.com").
             // 联系人
                 contact(new Contact("梁波", "", "perfect5085@163.com"))
             // 版本

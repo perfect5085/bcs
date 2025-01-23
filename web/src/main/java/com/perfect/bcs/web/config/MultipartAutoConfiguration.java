@@ -15,6 +15,10 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
 
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
 @Configuration
 @ConditionalOnClass({Servlet.class, StandardServletMultipartResolver.class, MultipartConfigElement.class})
 @ConditionalOnProperty(prefix = "spring.http.multipart", name = "enabled", matchIfMissing = true)

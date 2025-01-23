@@ -1,9 +1,9 @@
 package com.perfect.bcs.web.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.perfect.bcs.web.util.RequestUtil;
 import com.shuhong.common.shared.api.BizException;
 import com.shuhong.common.shared.api.ResultVO;
-import com.perfect.bcs.web.util.RequestUtil;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * 全局默认异常处理类
  *
  * @author liangbo 梁波
- * @since 2016-07-05 11:23
+ * @date 2025-01-22 22:37
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger    = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private static final Logger bizLogger = LoggerFactory.getLogger("bizErrorLogger");
 
     @Autowired
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
 
         ResultVO jsonResult = new ResultVO();
         String msg = MessageFormatter.format("BizErrorCode= {} RequestId= {}", e.getCode(), jsonResult.getRequestId())
-            .getMessage();
+                                     .getMessage();
         bizLogger.error(msg, e);
 
         jsonResult.setCode(e.getCode());
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
 
     private void loggerUrl(HttpServletRequest request, Logger logger) {
         String url = request.getRequestURL()
-            .toString();
+                            .toString();
         try {
             url = URLDecoder.decode(url, "utf-8");
         } catch (Throwable e) {
@@ -72,11 +72,11 @@ public class GlobalExceptionHandler {
 
         StringBuilder sb = new StringBuilder();
         sb.append(IOUtils.LINE_SEPARATOR)
-            .append("    requestUrl=")
-            .append(url);
+          .append("    requestUrl=")
+          .append(url);
         sb.append(IOUtils.LINE_SEPARATOR)
-            .append("    requestParam=")
-            .append(JSONObject.toJSONString(request.getParameterMap()));
+          .append("    requestParam=")
+          .append(JSONObject.toJSONString(request.getParameterMap()));
         logger.error(sb.toString());
     }
 
