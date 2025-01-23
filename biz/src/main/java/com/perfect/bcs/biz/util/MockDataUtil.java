@@ -1,4 +1,4 @@
-package com.perfect.bcs.biz;
+package com.perfect.bcs.biz.util;
 
 import com.google.common.collect.Lists;
 import java.util.List;

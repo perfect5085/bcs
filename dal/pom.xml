@@ -21,17 +21,6 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
-        <!-- 支持多数据源 SQL Server -->
-        <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>sqljdbc4</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-        <!-- 支持多数据源 postgresql -->
-        <dependency>
-            <artifactId>postgresql</artifactId>
-            <groupId>org.postgresql</groupId>
-        </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
@@ -53,16 +42,22 @@
             <artifactId>freemarker</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.shuhong</groupId>
             <artifactId>common-shared-weixin-utils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

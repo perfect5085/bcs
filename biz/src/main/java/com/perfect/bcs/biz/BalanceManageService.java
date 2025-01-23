@@ -83,13 +83,13 @@ public class BalanceManageService {
 
         String lockKey = getLockKeyAccountBalanceTransaction(transactionId);
         RLock lock = redissonClient.getLock(lockKey);
+
         try {
             // 尝试在10秒之内获取锁， 手动指定过期时间为 30 秒
             if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
-
+                boolean isSuccess = false;
                 // 最多重试3次
                 int retryIndex = 3;
-                boolean isSuccess = false;
                 while (retryIndex > 0) {
                     retryIndex--;
                     try {
@@ -105,11 +105,17 @@ public class BalanceManageService {
                         break;
                     } catch (Throwable e) {
                         log.error("存钱异常", e);
+                        // 很有可能数据不是最新的，更新一下最新的数据
+                        accountInfoDO = refreshAccountInfo(accountNo);
                         Thread.sleep(1000);
                     }
                 }
                 if (!isSuccess) {
+                    accountTransactionService.end(transactionId, TransactionStatus.FAILED);
                     throw new BizException(1002);
+                } else {
+                    // 更新缓存余额
+                    refreshAccountInfo(accountNo);
                 }
             }
         } catch (Throwable e) {
@@ -165,11 +171,19 @@ public class BalanceManageService {
                         break;
                     } catch (Throwable e) {
                         log.error("转账异常", e);
+                        // 很有可能数据不是最新的，更新一下最新的数据
+                        sourceAccountInfoDO = refreshAccountInfo(sourceAccountNo);
+                        targetAccountInfoDO = refreshAccountInfo(targetAccountNo);
                         Thread.sleep(1000);
                     }
                 }
                 if (!isSuccess) {
+                    accountTransactionService.end(transactionId, TransactionStatus.FAILED);
                     throw new BizException(1002);
+                } else {
+                    // 更新缓存余额
+                    refreshAccountInfo(sourceAccountNo);
+                    refreshAccountInfo(targetAccountNo);
                 }
             }
         } catch (Throwable e) {
@@ -223,22 +237,20 @@ public class BalanceManageService {
         BigDecimal newBalance = NumberUtil.add(accountBalance, amount);
         // 取款的数额大于账户的余额
         if (NumberUtil.isLess(newBalance, BigDecimal.ZERO)) {
-
             // 主动刷新一下余额，防止缓存数据不及时
             accountInfoDO = refreshAccountInfo(accountInfoDO.getAccountNo());
             accountBalance = accountInfoDO.getAccountBalance();
             newBalance = NumberUtil.add(accountBalance, amount);
+        }
 
-            // 取款的数额大于账户的余额，抛出异常
-            if (NumberUtil.isLess(newBalance, BigDecimal.ZERO)) {
+        // 取款的数额大于账户的余额，抛出异常
+        if (NumberUtil.isLess(newBalance, BigDecimal.ZERO)) {
 
-                accountTransactionService.end(transactionId, TransactionStatus.FAILED);
+            accountTransactionService.end(transactionId, TransactionStatus.FAILED);
 
-                throw new BizException(1003, accountInfoDO.getAccountNo());
-            } else {
-                innerChangeBalance(accountInfoDO, transactionId, amount);
-            }
-
+            throw new BizException(1003, accountInfoDO.getAccountNo());
+        } else {
+            innerChangeBalance(accountInfoDO, transactionId, amount);
         }
     }
 
@@ -276,7 +288,8 @@ public class BalanceManageService {
     }
 
     private AccountInfoDO getAccountInfo(String accountNo) {
-        String accountInfoStr = cacheService.get(accountNo);
+        String cacheKey = getCacheKeyAccountInfo(accountNo);
+        String accountInfoStr = cacheService.get(cacheKey);
 
         if (StrUtil.isBlank(accountInfoStr)) {
             return refreshAccountInfo(accountNo);
@@ -288,8 +301,7 @@ public class BalanceManageService {
 
         AccountInfoDO accountInfoDO = accountInfoService.getByAccountNo(accountNo);
         if (null == accountInfoDO) {
-            log.warn("账号 {} 不存在，请进一步确认账号是否正确！", accountNo);
-            return null;
+            throw new BizException(1000, accountNo);
         }
 
         String cacheKey = getCacheKeyAccountInfo(accountNo);

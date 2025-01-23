@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Throwable.class)
     @ResponseBody
     public ResultVO defaultExceptionHandler(HttpServletRequest request, Throwable e) {
-        loggerUrl(request, logger);
+        //loggerUrl(request, logger);
         ResultVO jsonResult = new ResultVO(RequestUtil.getRequestId(request));
         logger.error("System_error:requestId=" + jsonResult.getRequestId(), e);
         jsonResult.setCode(-1);
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BizException.class)
     @ResponseBody
     public ResultVO defaultBizExcetionHandler(HttpServletRequest request, BizException e) {
-        loggerUrl(request, bizLogger);
+        //loggerUrl(request, bizLogger);
 
         ResultVO jsonResult = new ResultVO();
         String msg = MessageFormatter.format("BizErrorCode= {} RequestId= {}", e.getCode(), jsonResult.getRequestId())
@@ -61,23 +61,23 @@ public class GlobalExceptionHandler {
         return jsonResult;
     }
 
-    private void loggerUrl(HttpServletRequest request, Logger logger) {
-        String url = request.getRequestURL()
-                            .toString();
-        try {
-            url = URLDecoder.decode(url, "utf-8");
-        } catch (Throwable e) {
-            logger.error("decode_error_url=" + url, e);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(IOUtils.LINE_SEPARATOR)
-          .append("    requestUrl=")
-          .append(url);
-        sb.append(IOUtils.LINE_SEPARATOR)
-          .append("    requestParam=")
-          .append(JSONObject.toJSONString(request.getParameterMap()));
-        logger.error(sb.toString());
-    }
+    //private void loggerUrl(HttpServletRequest request, Logger logger) {
+    //    String url = request.getRequestURL()
+    //                        .toString();
+    //    try {
+    //        url = URLDecoder.decode(url, "utf-8");
+    //    } catch (Throwable e) {
+    //        logger.error("decode_error_url=" + url, e);
+    //    }
+    //
+    //    StringBuilder sb = new StringBuilder();
+    //    sb.append(IOUtils.LINE_SEPARATOR)
+    //      .append("    requestUrl=")
+    //      .append(url);
+    //    sb.append(IOUtils.LINE_SEPARATOR)
+    //      .append("    requestParam=")
+    //      .append(JSONObject.toJSONString(request.getParameterMap()));
+    //    logger.error(sb.toString());
+    //}
 
 }

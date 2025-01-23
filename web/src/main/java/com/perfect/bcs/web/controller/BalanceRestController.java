@@ -48,7 +48,7 @@ public class BalanceRestController extends CommonController {
         Assert.notBlank(transactionId, "transactionId 不能为空！！！");
         Assert.notBlank(accountNo, "accountNo 不能为空！！！");
         Assert.notNull(amount, "amount 不能为空！！！");
-        Assert.isTrue(NumberUtil.isLess(amount, BigDecimal.ZERO), "amount 取款金额不能为负数！！！ ");
+        Assert.isFalse(NumberUtil.isLess(amount, BigDecimal.ZERO), "amount 取款金额不能为负数！！！ ");
 
         balanceManageService.changeBalance(transactionId, accountNo, NumberUtil.mul(amount, new BigDecimal("-1")));
     }
@@ -63,7 +63,7 @@ public class BalanceRestController extends CommonController {
         Assert.notBlank(transactionId, "transactionId 不能为空！！！");
         Assert.notBlank(accountNo, "accountNo 不能为空！！！");
         Assert.notNull(amount, "amount 不能为空！！！");
-        Assert.isTrue(NumberUtil.isLess(amount, BigDecimal.ZERO), "amount 存款金额不能为负数！！！ ");
+        Assert.isFalse(NumberUtil.isLess(amount, BigDecimal.ZERO), "amount 存款金额不能为负数！！！ ");
 
         balanceManageService.changeBalance(transactionId, accountNo, amount);
 
@@ -75,14 +75,14 @@ public class BalanceRestController extends CommonController {
             @ApiImplicitParam(name = "sourceAccountNo", value = "来源账户Id", required = true),
             @ApiImplicitParam(name = "targetAccountNo", value = "目标账户Id", required = true),
             @ApiImplicitParam(name = "amount", value = "转账数目，单位元，精确到分。转账不能是负数", required = true), })
-    @RequestMapping(value = "transfer.json")
+    @PostMapping(value = "transfer.json")
     public void transfer(String transactionId, String sourceAccountNo, String targetAccountNo, BigDecimal amount)
             throws Throwable {
         Assert.notBlank(transactionId, "transactionId 不能为空！！！");
         Assert.notBlank(sourceAccountNo, "sourceAccountNo 不能为空！！！");
         Assert.notBlank(targetAccountNo, "targetAccountNo 不能为空！！！");
         Assert.notNull(amount, "amount 不能为空！！！");
-        Assert.isTrue(NumberUtil.isLess(amount, BigDecimal.ZERO), "amount 转账金额不能为负数！！！ ");
+        Assert.isFalse(NumberUtil.isLess(amount, BigDecimal.ZERO), "amount 转账金额不能为负数！！！ ");
 
         balanceManageService.transferBalance(transactionId, sourceAccountNo, targetAccountNo, amount);
     }
