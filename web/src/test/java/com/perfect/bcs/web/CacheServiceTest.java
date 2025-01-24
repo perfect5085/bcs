@@ -13,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author liangbo 梁波
  * @date 2025-01-22 22:37
  */
-
 @SpringBootTest(classes = { ApplicationJar.class })
 @ExtendWith(SpringExtension.class)
 public class CacheServiceTest {

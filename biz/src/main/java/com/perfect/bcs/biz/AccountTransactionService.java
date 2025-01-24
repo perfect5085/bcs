@@ -17,6 +17,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AccountTransactionService extends ServiceImpl<AccountTransactionMapper, AccountTransactionDO> {
 
+    public AccountTransactionDO get(String transactionId) {
+
+        return lambdaQuery().eq(AccountTransactionDO::getTransactionId, transactionId)
+                            .one();
+    }
+
     public boolean create(String transactionId, String sourceAccountNo, String targetAccountNo,
                           BigDecimal transactionAmount) {
 

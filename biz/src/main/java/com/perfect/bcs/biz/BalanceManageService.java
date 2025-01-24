@@ -1,7 +1,7 @@
 package com.perfect.bcs.biz;
 
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.perfect.bcs.biz.type.AccountStatus;
@@ -16,7 +16,6 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author liangbo 梁波
@@ -32,6 +31,8 @@ public class BalanceManageService {
     private AccountTransactionService   accountTransactionService;
     @Autowired
     private AccountBalanceChangeService accountBalanceChangeService;
+    @Autowired
+    private BalanceAtomicService        balanceAtomicService;
     @Autowired
     private CacheService                cacheService;
     @Autowired
@@ -52,6 +53,12 @@ public class BalanceManageService {
      */
     private static final String LOCK_KEY_ACCOUNT_BALANCE_TRANSACTION_PREFIX = "acc_blc_t_l";
 
+    /**
+     * 获取账户余额
+     *
+     * @param accountNo 账户
+     * @return
+     */
     public BigDecimal getBalance(String accountNo) {
 
         AccountInfoDO accountInfoDO = getAccountInfo(accountNo);
@@ -64,6 +71,13 @@ public class BalanceManageService {
                        .orElse(null);
     }
 
+    /**
+     * 修改账户的余额【取款/存钱】
+     *
+     * @param transactionId 事务ID
+     * @param accountNo     账户
+     * @param amount        修改金额： 正数【取款】，负数【存钱】
+     */
     public void changeBalance(String transactionId, String accountNo, BigDecimal amount) {
 
         checkTransaction(transactionId);
@@ -104,10 +118,10 @@ public class BalanceManageService {
                         isSuccess = true;
                         break;
                     } catch (Throwable e) {
-                        log.error("存钱异常", e);
+                        log.error("存钱/取钱异常", e);
                         // 很有可能数据不是最新的，更新一下最新的数据
                         accountInfoDO = refreshAccountInfo(accountNo);
-                        Thread.sleep(1000);
+                        Thread.sleep(RandomUtil.randomInt(500, 3000));
                     }
                 }
                 if (!isSuccess) {
@@ -122,11 +136,21 @@ public class BalanceManageService {
             log.error("修改账户余额异常！", e);
             throw new BizException(1002);
         } finally {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
 
     }
 
+    /**
+     * 账户之间转账
+     *
+     * @param transactionId   事务ID
+     * @param sourceAccountNo 来源账户
+     * @param targetAccountNo 目标账户
+     * @param amount          从来源账户转给目标账户的金额：不能为负数
+     */
     public void transferBalance(String transactionId, String sourceAccountNo,
                                 String targetAccountNo, BigDecimal amount) {
 
@@ -134,6 +158,9 @@ public class BalanceManageService {
         boolean flag = accountTransactionService.create(transactionId, sourceAccountNo, targetAccountNo, amount);
         if (!flag) {
             throw new BizException(1004, transactionId);
+        }
+        if (StrUtil.equals(sourceAccountNo, targetAccountNo)) {
+            throw new BizException(1005, sourceAccountNo);
         }
 
         AccountInfoDO sourceAccountInfoDO = getAccountInfo(sourceAccountNo);
@@ -165,18 +192,21 @@ public class BalanceManageService {
                     retryIndex--;
                     try {
 
-                        innerTransferBalance(sourceAccountInfoDO, targetAccountInfoDO, transactionId, amount);
-
+                        balanceAtomicService.transferBalance(sourceAccountInfoDO, targetAccountInfoDO,
+                                                             transactionId,
+                                                             amount);
                         isSuccess = true;
                         break;
+
                     } catch (Throwable e) {
                         log.error("转账异常", e);
                         // 很有可能数据不是最新的，更新一下最新的数据
                         sourceAccountInfoDO = refreshAccountInfo(sourceAccountNo);
                         targetAccountInfoDO = refreshAccountInfo(targetAccountNo);
-                        Thread.sleep(1000);
+                        Thread.sleep(RandomUtil.randomInt(500, 3000));
                     }
                 }
+
                 if (!isSuccess) {
                     accountTransactionService.end(transactionId, TransactionStatus.FAILED);
                     throw new BizException(1002);
@@ -185,52 +215,37 @@ public class BalanceManageService {
                     refreshAccountInfo(sourceAccountNo);
                     refreshAccountInfo(targetAccountNo);
                 }
+
             }
         } catch (Throwable e) {
             log.error("转账异常！", e);
             throw new BizException(1002);
         } finally {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 
-    @Transactional(rollbackFor = Throwable.class)
-    private void innerTransferBalance(AccountInfoDO sourceAccountInfoDO, AccountInfoDO targetAccountInfoDO,
-                                      String transactionId, BigDecimal amount) {
-        String newDataVersion = IdUtil.fastSimpleUUID();
-
-        BigDecimal sourceBalance = NumberUtil.sub(sourceAccountInfoDO.getAccountBalance(), amount);
-        boolean sourceUpdateFlag = accountInfoService.updateBalance(sourceAccountInfoDO.getAccountNo(), sourceBalance,
-                                                                    sourceAccountInfoDO.getDataVersion(),
-                                                                    newDataVersion);
-
-        BigDecimal targetBalance = NumberUtil.add(targetAccountInfoDO.getAccountBalance(), amount);
-        boolean targetUpdateFlag = accountInfoService.updateBalance(targetAccountInfoDO.getAccountNo(), targetBalance,
-                                                                    targetAccountInfoDO.getDataVersion(),
-                                                                    newDataVersion);
-        if (!sourceUpdateFlag || !targetUpdateFlag) {
-            throw new RuntimeException("无法更新账户余额，很可能未获取到最新版本的数据");
-        }
-
-        boolean sourceChangeFlag = accountBalanceChangeService.create(transactionId, sourceAccountInfoDO.getAccountNo(),
-                                                                      NumberUtil.mul(amount, new BigDecimal("-1")));
-        boolean targetChangeFlag = accountBalanceChangeService.create(transactionId, targetAccountInfoDO.getAccountNo(),
-                                                                      amount);
-        if (!sourceChangeFlag || !targetChangeFlag) {
-            throw new RuntimeException("无法更新账户余额变动记录，很可能数据库有问题");
-        }
-
-        boolean transactionFlag = accountTransactionService.end(transactionId, TransactionStatus.SUCCESS);
-        if (!transactionFlag) {
-            throw new RuntimeException("无法更新交易记录，很可能数据库有问题");
-        }
-
-    }
-
+    /**
+     * 存钱
+     *
+     * @param accountInfoDO 账户
+     * @param transactionId 事务ID
+     * @param amount        金额
+     */
     private void deposite(AccountInfoDO accountInfoDO, String transactionId, BigDecimal amount) {
-        innerChangeBalance(accountInfoDO, transactionId, amount);
+
+        balanceAtomicService.changeBalance(accountInfoDO, transactionId, amount);
     }
 
+    /**
+     * 取钱
+     *
+     * @param accountInfoDO 账户
+     * @param transactionId 事务ID
+     * @param amount        金额
+     */
     private void withdraw(AccountInfoDO accountInfoDO, String transactionId, BigDecimal amount) {
         BigDecimal accountBalance = accountInfoDO.getAccountBalance();
 
@@ -250,32 +265,15 @@ public class BalanceManageService {
 
             throw new BizException(1003, accountInfoDO.getAccountNo());
         } else {
-            innerChangeBalance(accountInfoDO, transactionId, amount);
+            balanceAtomicService.changeBalance(accountInfoDO, transactionId, amount);
         }
     }
 
-    @Transactional(rollbackFor = Throwable.class)
-    private void innerChangeBalance(AccountInfoDO accountInfoDO, String transactionId, BigDecimal amount) {
-
-        BigDecimal balance = NumberUtil.add(accountInfoDO.getAccountBalance(), amount);
-        boolean updateFlag = accountInfoService.updateBalance(accountInfoDO.getAccountNo(), balance,
-                                                              accountInfoDO.getDataVersion(), IdUtil.fastSimpleUUID());
-        if (!updateFlag) {
-            throw new RuntimeException("无法更新账户余额，很可能未获取到最新版本的数据");
-        }
-
-        boolean changeFlag = accountBalanceChangeService.create(transactionId, accountInfoDO.getAccountNo(), amount);
-        if (!changeFlag) {
-            throw new RuntimeException("无法更新账户余额变动记录，很可能数据库有问题");
-        }
-
-        boolean transactionFlag = accountTransactionService.end(transactionId, TransactionStatus.SUCCESS);
-        if (!transactionFlag) {
-            throw new RuntimeException("无法更新交易记录，很可能数据库有问题");
-        }
-
-    }
-
+    /**
+     * 检测当前事务是否正在执行
+     *
+     * @param transactionId
+     */
     private void checkTransaction(String transactionId) {
         String key = getCacheKeyAccountBalanceTransaction(transactionId);
         String transactionFlag = cacheService.get(key);
@@ -287,6 +285,12 @@ public class BalanceManageService {
         cacheService.set(key, "1", 60);
     }
 
+    /**
+     * 获取账户信息
+     *
+     * @param accountNo 账户
+     * @return
+     */
     private AccountInfoDO getAccountInfo(String accountNo) {
         String cacheKey = getCacheKeyAccountInfo(accountNo);
         String accountInfoStr = cacheService.get(cacheKey);
@@ -297,6 +301,12 @@ public class BalanceManageService {
         return JSONUtil.toBean(accountInfoStr, AccountInfoDO.class);
     }
 
+    /**
+     * 强制刷新缓存
+     *
+     * @param accountNo 账户
+     * @return
+     */
     private AccountInfoDO refreshAccountInfo(String accountNo) {
 
         AccountInfoDO accountInfoDO = accountInfoService.getByAccountNo(accountNo);
