@@ -8,7 +8,7 @@ export app_name="bcs"
 ### 应用端口
 export server_port=9090
 ### 启动环境（profile）
-export profile_name="开发"
+export profile_name="生产"
 
 ### 后端项目
 export back_project_name="bcs"
