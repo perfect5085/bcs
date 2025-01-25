@@ -1,5 +1,8 @@
 # 使用 JDK 1.8 基础镜像
 FROM openjdk:8-jdk-alpine
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache curl
 
 # 设置工作目录
 WORKDIR /app
