@@ -1,5 +1,6 @@
 package com.perfect.bcs.biz;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.perfect.bcs.biz.type.TransactionStatus;
 import com.perfect.bcs.dal.domain.AccountTransactionDO;
@@ -21,6 +22,15 @@ public class AccountTransactionService extends ServiceImpl<AccountTransactionMap
 
         return lambdaQuery().eq(AccountTransactionDO::getTransactionId, transactionId)
                             .one();
+    }
+
+    public Page<AccountTransactionDO> getPageOfStarted(Integer pageIndex, Integer pageSize,
+                                                       Date startDate, Date endDate) {
+
+        return lambdaQuery().between(AccountTransactionDO::getTransactionStartTime, startDate, endDate)
+                            .eq(AccountTransactionDO::getTransactionStatus, TransactionStatus.STARTED)
+                            .orderByAsc(AccountTransactionDO::getId)
+                            .page(new Page<>(pageIndex, pageSize));
     }
 
     public boolean create(String transactionId, String sourceAccountNo, String targetAccountNo,

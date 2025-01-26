@@ -1,7 +1,10 @@
 package com.perfect.bcs.web.controller;
 
 import cn.hutool.core.util.NumberUtil;
+import com.perfect.bcs.biz.AccountTransactionService;
 import com.perfect.bcs.biz.BalanceManageService;
+import com.perfect.bcs.biz.common.BizException;
+import com.perfect.bcs.dal.domain.AccountTransactionDO;
 import com.perfect.bcs.web.controller.common.CommonController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,7 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class BalanceRestController extends CommonController {
 
     @Autowired
-    private BalanceManageService balanceManageService;
+    private BalanceManageService      balanceManageService;
+    @Autowired
+    private AccountTransactionService accountTransactionService;
 
     @ApiOperation(value = "查看账户余额")
     @ApiImplicitParams({
@@ -43,6 +48,19 @@ public class BalanceRestController extends CommonController {
     public BigDecimal get(@RequestParam @NotBlank String accountNo) throws Throwable {
 
         return balanceManageService.getBalance(accountNo);
+    }
+
+    @ApiOperation(value = "查看交易的状态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transactionId", value = "交易ID", required = true), })
+    @GetMapping(value = "/get-status-by-transaction-id")
+    public String getTransactionStatus(@RequestParam @NotBlank String transactionId) throws Throwable {
+
+        AccountTransactionDO transactionDO = accountTransactionService.get(transactionId);
+        if (null == transactionDO) {
+            throw new BizException(1007, transactionId);
+        }
+        return transactionDO.getTransactionStatus();
     }
 
     @ApiOperation(value = "取钱（扣款）")

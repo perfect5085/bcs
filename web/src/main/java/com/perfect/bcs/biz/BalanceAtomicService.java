@@ -1,11 +1,16 @@
 package com.perfect.bcs.biz;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.perfect.bcs.biz.common.BizException;
 import com.perfect.bcs.biz.type.TransactionStatus;
 import com.perfect.bcs.dal.domain.AccountInfoDO;
+import com.perfect.bcs.dal.domain.AccountTransactionDO;
 import java.math.BigDecimal;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,6 +73,13 @@ public class BalanceAtomicService {
             throw new RuntimeException("无法更新账户余额变动记录，很可能数据库有问题");
         }
 
+        AccountTransactionDO transactionDO = accountTransactionService.get(transactionId);
+        // 如果交易超过10分钟，也属于交易失败
+        if (DateUtil.between(transactionDO.getTransactionStartTime(), new Date(), DateUnit.MINUTE) > 10) {
+            accountTransactionService.end(transactionId, TransactionStatus.FAILED);
+            throw new BizException(1006, transactionId);
+        }
+
         boolean transactionFlag = accountTransactionService.end(transactionId, TransactionStatus.SUCCESS);
         if (!transactionFlag) {
             throw new RuntimeException("无法更新交易记录，很可能数据库有问题");
@@ -101,6 +113,13 @@ public class BalanceAtomicService {
         boolean changeFlag = accountBalanceChangeService.create(transactionId, accountInfoDO.getAccountNo(), amount);
         if (!changeFlag) {
             throw new RuntimeException("无法更新账户余额变动记录，很可能数据库有问题");
+        }
+
+        AccountTransactionDO transactionDO = accountTransactionService.get(transactionId);
+        // 如果交易超过10分钟，也属于交易失败
+        if (DateUtil.between(transactionDO.getTransactionStartTime(), new Date(), DateUnit.MINUTE) > 10) {
+            accountTransactionService.end(transactionId, TransactionStatus.FAILED);
+            throw new BizException(1006, transactionId);
         }
 
         boolean transactionFlag = accountTransactionService.end(transactionId, TransactionStatus.SUCCESS);

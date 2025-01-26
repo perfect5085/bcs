@@ -15,6 +15,8 @@
     <entry key="1003">账户 {0} 的余额不够，无法进行操作！</entry>
     <entry key="1004">交易 {0} 的已经执行或者正在执行，请勿重复提交！</entry>
     <entry key="1005">账户 {0} 的自己给自己转账，无法进行操作！</entry>
+    <entry key="1006">交易 {0} 执行超时，失败！</entry>
+    <entry key="1007">交易 {0} 不存在，请检查！</entry>
 
 
 </properties>

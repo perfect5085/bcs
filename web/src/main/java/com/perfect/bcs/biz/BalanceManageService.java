@@ -1,20 +1,28 @@
 package com.perfect.bcs.biz;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.perfect.bcs.biz.common.BizException;
 import com.perfect.bcs.biz.type.AccountStatus;
 import com.perfect.bcs.biz.type.TransactionStatus;
 import com.perfect.bcs.dal.domain.AccountInfoDO;
+import com.perfect.bcs.dal.domain.AccountTransactionDO;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,6 +60,65 @@ public class BalanceManageService {
      * 交易分布锁的前缀
      */
     private static final String LOCK_KEY_ACCOUNT_BALANCE_TRANSACTION_PREFIX = "acc_blc_t_l";
+
+    /**
+     * 定时任务的锁
+     */
+    private static final String LOCK_KEY_CHECK_TRANSACTION_STATUS = "che_tra_st";
+
+    /**
+     * 定时检查交易是否超时，如果超时重置为失败
+     */
+    @Scheduled(cron = "0 0/10 * * * ?")
+    @PostConstruct
+    public void checkTransactionStatus() {
+
+        // 防止多个任务同时执行
+        RLock lock = redissonClient.getLock(LOCK_KEY_CHECK_TRANSACTION_STATUS);
+        try {
+            // 尝试在10秒之内获取锁， 手动指定过期时间为 600 秒
+            if (lock.tryLock(10, 600, TimeUnit.SECONDS)) {
+                int pageIndex = 1;
+                int pageSize = 1000;
+
+                Date now = new Date();
+                // 向前推15分钟。
+                Date endDate = DateUtil.offsetMinute(now, -15);
+                // 向前推75分钟。
+                Date startDate = DateUtil.offsetMinute(now, -75);
+
+                while (true) {
+                    Page<AccountTransactionDO> page =
+                            accountTransactionService.getPageOfStarted(pageIndex, pageSize,
+                                                                       startDate, endDate);
+                    pageIndex++;
+                    if (CollUtil.isEmpty(page.getRecords())) {
+                        break;
+                    }
+
+                    // 数量一般很少
+                    for (AccountTransactionDO record : page.getRecords()) {
+                        try {
+                            // 如果交易超过10分钟，也属于交易失败
+                            if (DateUtil.between(record.getTransactionStartTime(), new Date(), DateUnit.MINUTE) > 10) {
+                                accountTransactionService.end(record.getTransactionId(), TransactionStatus.FAILED);
+                            }
+                        } catch (Throwable e) {
+                            log.error("重置交易失败异常", e);
+                        }
+                    }
+                }
+
+            }
+        } catch (Throwable e) {
+            log.error("定时检查交易状态异常！", e);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+
+    }
 
     /**
      * 获取账户余额
