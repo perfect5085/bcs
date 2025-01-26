@@ -1,17 +1,19 @@
 package com.perfect.bcs.web.handler;
 
-import com.alibaba.fastjson.JSONObject;
+import cn.hutool.core.util.StrUtil;
+import com.perfect.bcs.biz.common.BizException;
+import com.perfect.bcs.web.controller.common.ResultVO;
 import com.perfect.bcs.web.util.RequestUtil;
-import com.shuhong.common.shared.api.BizException;
-import com.shuhong.common.shared.api.ResultVO;
-import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.io.IOUtils;
+import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,7 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Throwable.class)
     @ResponseBody
     public ResultVO defaultExceptionHandler(HttpServletRequest request, Throwable e) {
-        //loggerUrl(request, logger);
+
         ResultVO jsonResult = new ResultVO(RequestUtil.getRequestId(request));
         logger.error("System_error:requestId=" + jsonResult.getRequestId(), e);
         jsonResult.setCode(-1);
@@ -47,7 +49,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BizException.class)
     @ResponseBody
     public ResultVO defaultBizExcetionHandler(HttpServletRequest request, BizException e) {
-        //loggerUrl(request, bizLogger);
 
         ResultVO jsonResult = new ResultVO();
         String msg = MessageFormatter.format("BizErrorCode= {} RequestId= {}", e.getCode(), jsonResult.getRequestId())
@@ -61,23 +62,49 @@ public class GlobalExceptionHandler {
         return jsonResult;
     }
 
-    //private void loggerUrl(HttpServletRequest request, Logger logger) {
-    //    String url = request.getRequestURL()
-    //                        .toString();
-    //    try {
-    //        url = URLDecoder.decode(url, "utf-8");
-    //    } catch (Throwable e) {
-    //        logger.error("decode_error_url=" + url, e);
-    //    }
-    //
-    //    StringBuilder sb = new StringBuilder();
-    //    sb.append(IOUtils.LINE_SEPARATOR)
-    //      .append("    requestUrl=")
-    //      .append(url);
-    //    sb.append(IOUtils.LINE_SEPARATOR)
-    //      .append("    requestParam=")
-    //      .append(JSONObject.toJSONString(request.getParameterMap()));
-    //    logger.error(sb.toString());
-    //}
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public ResultVO defaultConstraintViolationException(HttpServletRequest request, ConstraintViolationException e) {
+
+        ResultVO jsonResult = new ResultVO();
+        logger.error("System_error:requestId=" + jsonResult.getRequestId(), e);
+
+        int code = -2;
+        jsonResult.setCode(code);
+        jsonResult.setMessage(messageSource.getMessage(String.valueOf(code), null, request.getLocale()));
+
+        String message = e.getMessage();
+        int index = StrUtil.indexOf(message, '.');
+        if (index >= 0) {
+            message = StrUtil.subSuf(message, index + 1);
+        }
+        jsonResult.setErrorMessage("参数校验失败:" + message);
+
+        return jsonResult;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public ResultVO defaultMethodArgumentNotValidException(HttpServletRequest request,
+                                                           MethodArgumentNotValidException e) {
+
+        ResultVO jsonResult = new ResultVO();
+        logger.error("System_error:requestId=" + jsonResult.getRequestId(), e);
+
+        int code = -2;
+        jsonResult.setCode(code);
+        jsonResult.setMessage(messageSource.getMessage(String.valueOf(code), null, request.getLocale()));
+
+        BindingResult bindingResult = e.getBindingResult();
+        StringBuilder sb = new StringBuilder("参数校验失败:");
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            sb.append(fieldError.getField()).append(":").append(fieldError.getDefaultMessage()).append(",");
+        }
+        String msg = sb.toString();
+        msg = msg.substring(0, msg.length() - 1);
+        jsonResult.setErrorMessage(msg);
+
+        return jsonResult;
+    }
 
 }

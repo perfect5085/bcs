@@ -1,7 +1,7 @@
 package com.perfect.bcs.web.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.shuhong.common.shared.api.ResultVO;
+import com.perfect.bcs.web.controller.common.ResultVO;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;

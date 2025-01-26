@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-address-type: internet
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-instance-charge-type: PayByCLCU
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-ip-version: ipv4
+  creationTimestamp: '2025-01-25T13:41:39Z'
+  finalizers:
+    - service.k8s.alibaba/resources
+  labels:
+    service.beta.kubernetes.io/hash: e75114905dc943669d3b4734ad8d1c09a91cff6193f24d22ea422d85
+    service.k8s.alibaba/loadbalancer-id: lb-0jlemv1t0zcp78qqpgph4
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:finalizers':
+            .: {}
+            'v:"service.k8s.alibaba/resources"': {}
+      manager: cloud-controller-manager
+      operation: Update
+      time: '2025-01-25T13:41:39Z'
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:service.beta.kubernetes.io/alibaba-cloud-loadbalancer-address-type': {}
+            'f:service.beta.kubernetes.io/alibaba-cloud-loadbalancer-instance-charge-type': {}
+            'f:service.beta.kubernetes.io/alibaba-cloud-loadbalancer-ip-version': {}
+        'f:spec':
+          'f:allocateLoadBalancerNodePorts': {}
+          'f:externalTrafficPolicy': {}
+          'f:internalTrafficPolicy': {}
+          'f:ports':
+            .: {}
+            'k:{"port":9090,"protocol":"TCP"}':
+              .: {}
+              'f:name': {}
+              'f:port': {}
+              'f:protocol': {}
+              'f:targetPort': {}
+          'f:selector': {}
+          'f:sessionAffinity': {}
+          'f:type': {}
+      manager: okhttp
+      operation: Update
+      time: '2025-01-25T13:41:39Z'
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:labels':
+            .: {}
+            'f:service.beta.kubernetes.io/hash': {}
+            'f:service.k8s.alibaba/loadbalancer-id': {}
+        'f:status':
+          'f:loadBalancer':
+            'f:ingress': {}
+      manager: cloud-controller-manager
+      operation: Update
+      subresource: status
+      time: '2025-01-25T13:41:44Z'
+  name: bcs-prod-svc-g8vjn
+  namespace: default
+  resourceVersion: '3102657938'
+  uid: cf14468a-48df-486f-85a2-568e3336efd5
+spec:
+  allocateLoadBalancerNodePorts: true
+  clusterIP: 192.168.181.97
+  clusterIPs:
+    - 192.168.181.97
+  externalTrafficPolicy: Local
+  healthCheckNodePort: 31240
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: bcs-web
+      nodePort: 31495
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+  selector:
+    app: bcs-prod
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+      - ip: 8.130.178.136
+        ipMode: VIP

@@ -612,7 +612,7 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">8.130.178.124</stringProp>
+          <stringProp name="HTTPSampler.domain">8.130.178.136</stringProp>
           <stringProp name="HTTPSampler.port">9090</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
