@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalRestControllerHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.web.handler</a> &gt; <span class="el_source">GlobalRestControllerHandler.java</span></div><h1>GlobalRestControllerHandler.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.web.handler;
+
+import com.alibaba.fastjson.JSONObject;
+import com.perfect.bcs.web.controller.common.ResultVO;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+@RestControllerAdvice(basePackages = {&quot;com.perfect.bcs.web.controller&quot;})
+<span class="fc" id="L18">public class GlobalRestControllerHandler implements ResponseBodyAdvice&lt;Object&gt; {</span>
+
+    @Override
+    public boolean supports(MethodParameter returnType, Class&lt;? extends HttpMessageConverter&lt;?&gt;&gt; aClass) {
+        // 如果接口返回的类型本身就是ResultVO那就没有必要进行额外的操作，返回false
+<span class="fc" id="L23">        return !returnType.getGenericParameterType()</span>
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">            .equals(ResultVO.class);</span>
+    }
+
+    @Override
+    public Object beforeBodyWrite(Object data, MethodParameter returnType, MediaType mediaType,
+                                  Class&lt;? extends HttpMessageConverter&lt;?&gt;&gt; aClass, ServerHttpRequest request,
+                                  ServerHttpResponse response) {
+        // String类型不能直接包装，所以要进行些特别的处理
+<span class="fc" id="L32">        if (returnType.getGenericParameterType()</span>
+<span class="pc bpc" id="L33" title="2 of 4 branches missed.">            .equals(String.class) || data instanceof String) {</span>
+            // 将数据包装在ResultVO里后，再转换为json字符串响应给前端
+<span class="nc" id="L35">            return JSONObject.toJSONString(new ResultVO(data));</span>
+
+        }
+        // 将原本的数据包装在ResultVO里
+<span class="fc" id="L39">        return new ResultVO(data);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

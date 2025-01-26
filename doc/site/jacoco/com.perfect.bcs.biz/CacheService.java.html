@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CacheService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.biz</a> &gt; <span class="el_source">CacheService.java</span></div><h1>CacheService.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.biz;
+
+import cn.hutool.core.util.StrUtil;
+import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
+import org.slf4j.helpers.MessageFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+@Service
+<span class="fc" id="L19">@Slf4j</span>
+<span class="fc" id="L20">public class CacheService {</span>
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    private static final int CACHE_MAX_SECOND = 30 * 24 * 3600;
+
+    /**
+     * 添加缓存项
+     *
+     * @param expiredSeconds 缓存的秒数,最长可缓存30天
+     */
+    public void set(String key, String value, Integer expiredSeconds) {
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (!checkKey(key)) {</span>
+<span class="fc" id="L34">            throw new RuntimeException(&quot;key 不满足要求&quot;);</span>
+        }
+
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (null == value) {</span>
+<span class="fc" id="L38">            String msg = StrUtil.format(&quot;error_cache_empty_value_for_key={}_value=null&quot;, key);</span>
+<span class="fc" id="L39">            throw new RuntimeException(msg);</span>
+        }
+
+<span class="fc bfc" id="L42" title="All 6 branches covered.">        if (null == expiredSeconds || expiredSeconds &lt;= 0 || expiredSeconds &gt; CACHE_MAX_SECOND) {</span>
+<span class="fc" id="L43">            String msg = StrUtil.format(&quot;error_cacheWrongExpiredSeconds_key={}_expiredSeconds={}&quot;, key,</span>
+                                        expiredSeconds);
+<span class="fc" id="L45">            throw new RuntimeException(msg);</span>
+        }
+
+<span class="fc" id="L48">        RBucket&lt;String&gt; bucket = redissonClient.getBucket(key, new StringCodec());</span>
+<span class="fc" id="L49">        bucket.set(value, expiredSeconds, TimeUnit.SECONDS);</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * 取出缓存项
+     */
+    public String get(String key) {
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (!checkKey(key)) {</span>
+<span class="nc" id="L57">            return null;</span>
+        }
+
+<span class="fc" id="L60">        RBucket&lt;String&gt; bucket = redissonClient.getBucket(key, new StringCodec());</span>
+<span class="fc" id="L61">        return bucket.get();</span>
+    }
+
+    /**
+     * &lt;pre&gt;
+     *     检测事项如下:
+     *     1, key不能为空
+     *     2, key的长度不能超过128字段
+     * &lt;/pre&gt;
+     */
+    private boolean checkKey(String key) {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (StringUtils.isBlank(key)) {</span>
+<span class="fc" id="L73">            log.error(&quot;error_cache_key={}&quot;, key);</span>
+<span class="fc" id="L74">            return false;</span>
+        }
+
+        try {
+<span class="fc" id="L78">            byte[] keyByte = key.getBytes(&quot;UTF-8&quot;);</span>
+            // key的长度不能超过128字节, 太长了,效率太低
+<span class="fc bfc" id="L80" title="All 2 branches covered.">            if (keyByte.length &gt; 128) {</span>
+<span class="fc" id="L81">                log.error(&quot;error_cache_key={}_key_length &gt; 128&quot;, key);</span>
+<span class="fc" id="L82">                return false;</span>
+            }
+<span class="nc" id="L84">        } catch (Throwable e) {</span>
+<span class="nc" id="L85">            String msg = MessageFormatter.format(&quot;error_getByte_for_key={}&quot;, key)</span>
+<span class="nc" id="L86">                                         .getMessage();</span>
+<span class="nc" id="L87">            log.error(msg, e);</span>
+<span class="nc" id="L88">            return false;</span>
+<span class="fc" id="L89">        }</span>
+
+<span class="fc" id="L91">        return true;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ResultVO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.web.controller.common</a> &gt; <span class="el_source">ResultVO.java</span></div><h1>ResultVO.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.web.controller.common;
+
+import java.io.Serializable;
+import lombok.Data;
+import org.apache.commons.lang3.SystemUtils;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-26 12:24
+ */
+<span class="nc bnc" id="L11" title="All 94 branches missed.">@Data</span>
+public class ResultVO&lt;T&gt; implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * &lt;pre&gt;
+     *      0代表成功，其它值代表失败
+     *      大于0，代表业务提示，可以讲 message 展示给用户（不符合业务规则导致的失败）
+     *      小于0，代表系统错误提示，不能展示给用户（因为系统的一些Bug导致的失败）
+     * &lt;/pre&gt;
+     */
+<span class="pc" id="L23">    private Integer code = 0;</span>
+
+    /**
+     * &lt;pre&gt;
+     *      针对code的描述:
+     *      注意：展现给用户时,需要考虑国际化
+     * &lt;/pre&gt;
+     */
+<span class="pc" id="L31">    private String message = &quot;成功&quot;;</span>
+
+    /**
+     * 系统错误提示 : 为了便于排查问题
+     */
+<span class="fc" id="L36">    private String errorMessage;</span>
+
+    /**
+     * 结果数据
+     */
+<span class="fc" id="L41">    private T data;</span>
+
+    /**
+     * 版本号
+     */
+<span class="fc" id="L46">    private String version;</span>
+
+    /**
+     * 发起请求id ：通常由发起方生成，代表唯一的一次请求
+     */
+<span class="fc" id="L51">    private String requestId;</span>
+
+    /**
+     * &lt;pre&gt;
+     *  发起请求时间戳 ： 代表在什么时间点发出请求
+     *  请使用时间格式：yyyy-MM-dd HH:mm:ss，例如：2019-05-09 09:08:01
+     *  注意：如果小于10，前面补0
+     * &lt;/pre&gt;
+     */
+<span class="fc" id="L60">    private String requestTimestamp;</span>
+
+    /**
+     * &lt;pre&gt;
+     *  应用接收到请求的时间戳 ： 代表在什么时间点接收到请求
+     *  请使用时间格式：yyyy-MM-dd HH:mm:ss，例如：2019-05-09 09:08:01
+     *  注意：如果小于10，前面补0
+     *  DateFormatUtils.format(new Date(), &quot;yyyy-MM-dd HH:mm:ss&quot;);
+     * &lt;/pre&gt;
+     */
+<span class="fc" id="L70">    private String receivedTimestamp;</span>
+
+    /**
+     * 响应id ：通常由响应方生成，代表唯一的一次响应
+     */
+<span class="fc" id="L75">    private String responseId;</span>
+
+    /**
+     * &lt;pre&gt;
+     *  请求响应时间戳 ： 代表在什么时间点发出响应请求
+     *  请使用时间格式：yyyy-MM-dd HH:mm:ss，例如：2019-05-09 09:08:01
+     *  注意：如果小于10，前面补0
+     * &lt;/pre&gt;
+     */
+<span class="fc" id="L84">    private String responseTimestamp;</span>
+
+    /**
+     * 后端应用处理的时长，单位毫秒
+     */
+<span class="fc" id="L89">    private Integer responseDuration;</span>
+
+<span class="nc" id="L91">    public ResultVO() {</span>
+<span class="nc" id="L92">    }</span>
+
+<span class="fc" id="L94">    public ResultVO(T data) {</span>
+<span class="fc" id="L95">        this.data = data;</span>
+<span class="fc" id="L96">    }</span>
+
+<span class="nc" id="L98">    public ResultVO(Integer code, String message) {</span>
+<span class="nc" id="L99">        this.code = code;</span>
+<span class="nc" id="L100">        this.message = message;</span>
+<span class="nc" id="L101">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L105">        return new StringBuilder(&quot;requestId=&quot;).append(requestId)</span>
+<span class="nc" id="L106">                                              .append(SystemUtils.LINE_SEPARATOR)</span>
+<span class="nc" id="L107">                                              .append(&quot;code=&quot;)</span>
+<span class="nc" id="L108">                                              .append(code)</span>
+<span class="nc" id="L109">                                              .append(SystemUtils.LINE_SEPARATOR)</span>
+<span class="nc" id="L110">                                              .append(&quot;message=&quot;)</span>
+<span class="nc" id="L111">                                              .append(message)</span>
+<span class="nc" id="L112">                                              .append(SystemUtils.LINE_SEPARATOR)</span>
+<span class="nc" id="L113">                                              .append(&quot;errorMessage=&quot;)</span>
+<span class="nc" id="L114">                                              .append(errorMessage)</span>
+<span class="nc" id="L115">                                              .append(SystemUtils.LINE_SEPARATOR)</span>
+<span class="nc" id="L116">                                              .append(&quot;version=&quot;)</span>
+<span class="nc" id="L117">                                              .append(version)</span>
+<span class="nc" id="L118">                                              .append(SystemUtils.LINE_SEPARATOR)</span>
+<span class="nc" id="L119">                                              .append(&quot;responseDuration=&quot;)</span>
+<span class="nc" id="L120">                                              .append(responseDuration)</span>
+<span class="nc" id="L121">                                              .append(SystemUtils.LINE_SEPARATOR)</span>
+<span class="nc" id="L122">                                              .toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

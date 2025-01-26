@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyEnvironmentPostProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.web</a> &gt; <span class="el_source">MyEnvironmentPostProcessor.java</span></div><h1>MyEnvironmentPostProcessor.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.web;
+
+import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.boot.env.YamlPropertySourceLoader;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.stereotype.Component;
+
+/**
+ * 自定义环境处理，在运行SpringApplication之前加载任意配置文件到Environment环境中
+ *
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+<span class="fc" id="L29">@Slf4j</span>
+@Component
+<span class="fc" id="L31">public class MyEnvironmentPostProcessor implements EnvironmentPostProcessor {</span>
+
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+
+        // 获取激活的profile集合
+<span class="fc" id="L37">        List&lt;String&gt; profileList = getActiveProfiles(environment);</span>
+<span class="fc" id="L38">        environment.setActiveProfiles(profileList.toArray(new String[0]));</span>
+
+<span class="fc" id="L40">        Map&lt;String, Resource&gt; resourceMap = getResourceMap();</span>
+
+        //循环添加
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        for (String profile : profileList) {</span>
+            //从classpath路径下面查找文件
+<span class="fc" id="L45">            Resource resource = resourceMap.get(profile);</span>
+            //加载成PropertySource对象，并添加到Environment环境中
+<span class="fc" id="L47">            environment.getPropertySources()</span>
+<span class="fc" id="L48">                       .addLast(loadProfiles(resource));</span>
+<span class="fc" id="L49">        }</span>
+<span class="fc" id="L50">    }</span>
+
+    private List&lt;String&gt; getActiveProfiles(ConfigurableEnvironment environment) {
+
+<span class="fc" id="L54">        String springActiveProfileKey = &quot;spring.profiles.active&quot;;</span>
+        // 从environment中获取profile名称，通过jvm参数、命令行参数、默认application.properties任意一种方式配置都可以获取到
+<span class="fc" id="L56">        String jvmOrCmdlineActiveProfile = environment.getProperty(springActiveProfileKey);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (log.isWarnEnabled()) {</span>
+<span class="fc" id="L58">            log.warn(&quot;jvmOrCmdlineActiveProfile = {}&quot;, jvmOrCmdlineActiveProfile);</span>
+        }
+
+        String activeProfile;
+        // 如果是本地IDEA，Eclipse等启动， defaultActiveProfile 为空
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if (StrUtil.isBlank(jvmOrCmdlineActiveProfile)) {</span>
+            // 读取默认： application.properties
+<span class="nc" id="L65">            Resource resource = new ClassPathResource(&quot;application.properties&quot;);</span>
+            try {
+<span class="nc" id="L67">                properties.load(resource.getInputStream());</span>
+<span class="nc" id="L68">            } catch (Throwable e) {</span>
+<span class="nc" id="L69">                throw new RuntimeException(&quot;找不到&quot; + jvmOrCmdlineActiveProfile + &quot;配置文件&quot;, e);</span>
+<span class="nc" id="L70">            }</span>
+
+            // 读取指定激活的 profile
+<span class="nc" id="L73">            activeProfile = properties.getProperty(springActiveProfileKey);</span>
+<span class="nc" id="L74">        } else {</span>
+<span class="fc" id="L75">            activeProfile = jvmOrCmdlineActiveProfile;</span>
+        }
+        // 避免 null
+<span class="fc" id="L78">        activeProfile = StrUtil.trimToEmpty(activeProfile);</span>
+
+        // 总是第一个读取默认的配置文件： application-default.properties
+<span class="fc" id="L81">        List&lt;String&gt; profileList = Lists.newArrayList(&quot;default&quot;);</span>
+        // 然后读取指定的配置文件，后面的配置文件会覆盖前面配置文件的值
+<span class="fc" id="L83">        profileList.add(activeProfile);</span>
+
+<span class="fc" id="L85">        return profileList;</span>
+    }
+
+    /**
+     * 从 profile 文件夹中读取所有的配置文件
+     *
+     * @return
+     */
+    private Map&lt;String, Resource&gt; getResourceMap() {
+
+<span class="fc" id="L95">        String profilePattern = &quot;classpath:profile/**/application*&quot;;</span>
+<span class="fc" id="L96">        Map&lt;String, Resource&gt; resourceMap = Maps.newHashMap();</span>
+<span class="fc" id="L97">        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();</span>
+        try {
+<span class="fc" id="L99">            Resource[] resourceArray = resolver.getResources(profilePattern);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            for (Resource resource : resourceArray) {</span>
+
+<span class="fc" id="L102">                String fileName = resource.getFilename();</span>
+                // 查找出： properties yml 的文件
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">                if (StrUtil.endWith(fileName, &quot;.properties&quot;)</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                        || StrUtil.endWith(fileName, &quot;.yml&quot;)</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">                        || StrUtil.endWith(fileName, &quot;.yaml&quot;)) {</span>
+
+                    // 解析 profile 的名称
+                    // 1 移除前缀
+<span class="fc" id="L110">                    fileName = StrUtil.removePrefix(fileName, &quot;application&quot;);</span>
+<span class="fc" id="L111">                    fileName = StrUtil.removePrefix(fileName, &quot;-&quot;);</span>
+                    // 2 移除后缀
+<span class="fc" id="L113">                    fileName = StrUtil.removeSuffix(fileName, &quot;.properties&quot;);</span>
+<span class="fc" id="L114">                    fileName = StrUtil.removeSuffix(fileName, &quot;.yml&quot;);</span>
+<span class="fc" id="L115">                    fileName = StrUtil.removeSuffix(fileName, &quot;.yaml&quot;);</span>
+
+<span class="fc" id="L117">                    resourceMap.put(fileName, resource);</span>
+                }
+            }
+<span class="nc" id="L120">        } catch (Throwable e) {</span>
+<span class="nc" id="L121">            throw new RuntimeException(&quot;读取 &quot; + profilePattern + &quot; 异常&quot;, e);</span>
+<span class="fc" id="L122">        }</span>
+<span class="fc" id="L123">        return resourceMap;</span>
+    }
+
+    /**
+     * 缓存 Properties对象
+     */
+<span class="fc" id="L129">    private final Properties properties = new Properties();</span>
+
+    /**
+     * 加载单个配置文件
+     */
+    private PropertySource&lt;?&gt; loadProfiles(Resource resource) {
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        if (!resource.exists()) {</span>
+<span class="nc" id="L136">            throw new IllegalArgumentException(&quot;异常：配置文件 &quot; + resource.getFilename() + &quot; 不存在&quot;);</span>
+        }
+
+        try {
+<span class="fc" id="L140">            String resourceName = resource.getFilename();</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">            if (StrUtil.endWith(resourceName, &quot;.properties&quot;)) {</span>
+<span class="fc" id="L142">                properties.load(resource.getInputStream());</span>
+<span class="fc" id="L143">                return new PropertiesPropertySource(resource.getFilename(), properties);</span>
+
+            } else {
+<span class="nc" id="L146">                YamlPropertySourceLoader sourceLoader = new YamlPropertySourceLoader();</span>
+<span class="nc" id="L147">                List&lt;PropertySource&lt;?&gt;&gt; propertySources = sourceLoader.load(resource.getFilename(), resource);</span>
+<span class="nc" id="L148">                return propertySources.get(0);</span>
+            }
+<span class="nc" id="L150">        } catch (IOException ex) {</span>
+<span class="nc" id="L151">            throw new IllegalStateException(&quot;解析配置文件失败: &quot; + resource.getFilename(), ex);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

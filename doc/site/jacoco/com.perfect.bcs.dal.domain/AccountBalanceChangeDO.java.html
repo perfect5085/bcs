@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccountBalanceChangeDO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.dal.domain</a> &gt; <span class="el_source">AccountBalanceChangeDO.java</span></div><h1>AccountBalanceChangeDO.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.dal.domain;
+
+import java.math.BigDecimal;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import java.util.Date;
+import com.baomidou.mybatisplus.annotation.TableId;
+import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+/**
+ * &lt;p&gt;
+ * 账户余额变动表
+ * &lt;/p&gt;
+ *
+ * @author MyBatis-Plus自动生成
+ * @since 2025-01-22
+ */
+<span class="pc" id="L22">@Data</span>
+<span class="nc bnc" id="L23" title="All 56 branches missed.">@EqualsAndHashCode(callSuper = true)</span>
+@Accessors(chain = true)
+@TableName(&quot;account_balance_change&quot;)
+public class AccountBalanceChangeDO extends Model&lt;AccountBalanceChangeDO&gt; {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * id
+     */
+    @TableId(value = &quot;id&quot;, type = IdType.AUTO)
+<span class="nc" id="L34">    private Long id;</span>
+
+    /**
+     * 交易ID
+     */
+<span class="fc" id="L39">    private String transactionId;</span>
+
+    /**
+     * 账户
+     */
+<span class="fc" id="L44">    private String accountNo;</span>
+
+    /**
+     * 变动金额：正值表示增加；负值表示扣减
+     */
+<span class="fc" id="L49">    private BigDecimal changeAmount;</span>
+
+    /**
+     * 创建时间
+     */
+<span class="fc" id="L54">    private Date createTime;</span>
+
+    /**
+     * 最后修改时间
+     */
+<span class="fc" id="L59">    private Date modifyTime;</span>
+
+
+    @Override
+    protected Serializable pkVal() {
+<span class="nc" id="L64">        return this.id;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

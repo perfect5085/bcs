@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RequestUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.web.util</a> &gt; <span class="el_source">RequestUtil.java</span></div><h1>RequestUtil.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.web.util;
+
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.util.Assert;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+<span class="nc" id="L10">public class RequestUtil {</span>
+
+    public static final String KEY_REQUEST_ID  = &quot;requestId&quot;;
+    public static final String KEY_RESPONSE_ID = &quot;responseId&quot;;
+
+    /**
+     * 设置当前请求的request id
+     *
+     * @param request
+     * @param requestId
+     */
+    public static void setRequestId(HttpServletRequest request, String requestId) {
+<span class="nc" id="L22">        Assert.notNull(requestId, &quot;requestId is required!&quot;);</span>
+<span class="nc" id="L23">        request.setAttribute(KEY_REQUEST_ID, requestId);</span>
+<span class="nc" id="L24">    }</span>
+
+    public static String getRequestId(HttpServletRequest request) {
+<span class="nc" id="L27">        return (String) request.getAttribute(KEY_REQUEST_ID);</span>
+    }
+
+    /**
+     * 设置当前请求的response id
+     */
+    public static void setResponseId(HttpServletRequest request, String responseId) {
+<span class="nc" id="L34">        Assert.notNull(responseId, &quot;responseId is required!&quot;);</span>
+<span class="nc" id="L35">        request.setAttribute(KEY_RESPONSE_ID, responseId);</span>
+<span class="nc" id="L36">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

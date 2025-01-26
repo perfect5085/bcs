@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BalanceAtomicService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.biz</a> &gt; <span class="el_source">BalanceAtomicService.java</span></div><h1>BalanceAtomicService.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.biz;
+
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
+import com.perfect.bcs.biz.type.TransactionStatus;
+import com.perfect.bcs.dal.domain.AccountInfoDO;
+import java.math.BigDecimal;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 21:45
+ */
+@Service
+<span class="fc" id="L21">@Slf4j</span>
+<span class="fc" id="L22">public class BalanceAtomicService {</span>
+
+    @Autowired
+    private AccountInfoService          accountInfoService;
+    @Autowired
+    private AccountTransactionService   accountTransactionService;
+    @Autowired
+    private AccountBalanceChangeService accountBalanceChangeService;
+
+    /**
+     * 两个账户之间转账【原子化操作，要么全部成功，要么全部失败（回滚数据）】
+     *
+     * @param sourceAccountInfoDO
+     * @param targetAccountInfoDO
+     * @param transactionId
+     * @param amount
+     */
+    @Transactional(propagation = Propagation.REQUIRED,
+            isolation = Isolation.READ_COMMITTED,
+            rollbackFor = Throwable.class)
+    public void transferBalance(AccountInfoDO sourceAccountInfoDO, AccountInfoDO targetAccountInfoDO,
+                                String transactionId, BigDecimal amount) {
+<span class="fc" id="L44">        String newDataVersion = IdUtil.fastSimpleUUID();</span>
+
+<span class="fc" id="L46">        BigDecimal sourceBalance = NumberUtil.sub(sourceAccountInfoDO.getAccountBalance(), amount);</span>
+<span class="fc" id="L47">        boolean sourceUpdateFlag = accountInfoService.updateBalance(sourceAccountInfoDO.getAccountNo(),</span>
+                                                                    sourceBalance,
+<span class="fc" id="L49">                                                                    sourceAccountInfoDO.getDataVersion(),</span>
+                                                                    newDataVersion);
+
+<span class="fc" id="L52">        BigDecimal targetBalance = NumberUtil.add(targetAccountInfoDO.getAccountBalance(), amount);</span>
+<span class="fc" id="L53">        boolean targetUpdateFlag = accountInfoService.updateBalance(targetAccountInfoDO.getAccountNo(),</span>
+                                                                    targetBalance,
+<span class="fc" id="L55">                                                                    targetAccountInfoDO.getDataVersion(),</span>
+                                                                    newDataVersion);
+<span class="fc bfc" id="L57" title="All 4 branches covered.">        if (!sourceUpdateFlag || !targetUpdateFlag) {</span>
+<span class="fc" id="L58">            throw new RuntimeException(&quot;无法更新账户余额，很可能未获取到最新版本的数据&quot;);</span>
+        }
+
+<span class="fc" id="L61">        boolean sourceChangeFlag = accountBalanceChangeService.create(transactionId,</span>
+<span class="fc" id="L62">                                                                      sourceAccountInfoDO.getAccountNo(),</span>
+<span class="fc" id="L63">                                                                      NumberUtil.mul(amount, new BigDecimal(&quot;-1&quot;)));</span>
+<span class="fc" id="L64">        boolean targetChangeFlag = accountBalanceChangeService.create(transactionId,</span>
+<span class="fc" id="L65">                                                                      targetAccountInfoDO.getAccountNo(),</span>
+                                                                      amount);
+<span class="pc bpc" id="L67" title="2 of 4 branches missed.">        if (!sourceChangeFlag || !targetChangeFlag) {</span>
+<span class="nc" id="L68">            throw new RuntimeException(&quot;无法更新账户余额变动记录，很可能数据库有问题&quot;);</span>
+        }
+
+<span class="fc" id="L71">        boolean transactionFlag = accountTransactionService.end(transactionId, TransactionStatus.SUCCESS);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (!transactionFlag) {</span>
+<span class="nc" id="L73">            throw new RuntimeException(&quot;无法更新交易记录，很可能数据库有问题&quot;);</span>
+        }
+<span class="fc" id="L75">        String msg = StrUtil.format(&quot;账户 {} 向 账户 {} 转账 {} 元，成功！&quot;,</span>
+<span class="fc" id="L76">                                    sourceAccountInfoDO.getAccountNo(),</span>
+<span class="fc" id="L77">                                    targetAccountInfoDO.getAccountNo(),</span>
+                                    amount);
+<span class="fc" id="L79">        log.info(msg);</span>
+<span class="fc" id="L80">    }</span>
+
+    /**
+     * 单个账户修改余额【原子化操作，要么全部成功，要么全部失败（回滚数据）】
+     *
+     * @param accountInfoDO
+     * @param transactionId
+     * @param amount
+     */
+    @Transactional(propagation = Propagation.REQUIRED,
+            isolation = Isolation.READ_COMMITTED,
+            rollbackFor = Throwable.class)
+    public void changeBalance(AccountInfoDO accountInfoDO, String transactionId, BigDecimal amount) {
+
+<span class="fc" id="L94">        BigDecimal balance = NumberUtil.add(accountInfoDO.getAccountBalance(), amount);</span>
+<span class="fc" id="L95">        boolean updateFlag = accountInfoService.updateBalance(accountInfoDO.getAccountNo(), balance,</span>
+<span class="fc" id="L96">                                                              accountInfoDO.getDataVersion(), IdUtil.fastSimpleUUID());</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        if (!updateFlag) {</span>
+<span class="fc" id="L98">            throw new RuntimeException(&quot;无法更新账户余额，很可能未获取到最新版本的数据&quot;);</span>
+        }
+
+<span class="fc" id="L101">        boolean changeFlag = accountBalanceChangeService.create(transactionId, accountInfoDO.getAccountNo(), amount);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (!changeFlag) {</span>
+<span class="nc" id="L103">            throw new RuntimeException(&quot;无法更新账户余额变动记录，很可能数据库有问题&quot;);</span>
+        }
+
+<span class="fc" id="L106">        boolean transactionFlag = accountTransactionService.end(transactionId, TransactionStatus.SUCCESS);</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (!transactionFlag) {</span>
+<span class="nc" id="L108">            throw new RuntimeException(&quot;无法更新交易记录，很可能数据库有问题&quot;);</span>
+        }
+
+<span class="fc" id="L111">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

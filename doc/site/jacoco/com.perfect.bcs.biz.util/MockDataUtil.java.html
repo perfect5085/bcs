@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MockDataUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.biz.util</a> &gt; <span class="el_source">MockDataUtil.java</span></div><h1>MockDataUtil.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.biz.util;
+
+import com.google.common.collect.Lists;
+import java.util.List;
+import org.apache.commons.lang3.RandomUtils;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+<span class="nc" id="L11">public class MockDataUtil {</span>
+
+    /**
+     * 姓氏大全列表
+     */
+    public static List&lt;String&gt; getSurnameList() {
+<span class="nc" id="L17">        String[] surname = { &quot;怀&quot;, &quot;老&quot;, &quot;堂&quot;, &quot;考&quot;, &quot;逄&quot;, &quot;栋&quot;, &quot;闻人&quot;, &quot;树&quot;, &quot;栗&quot;, &quot;候&quot;, &quot;通&quot;, &quot;速&quot;, &quot;校&quot;, &quot;逢&quot;, &quot;性&quot;,</span>
+                             &quot;倪&quot;, &quot;逮&quot;, &quot;逯&quot;,
+                             &quot;堵&quot;, &quot;栾&quot;, &quot;耿&quot;, &quot;桂&quot;, &quot;聂&quot;, &quot;衅&quot;, &quot;遇&quot;, &quot;聊&quot;, &quot;行&quot;, &quot;桐&quot;, &quot;桑&quot;, &quot;桓&quot;, &quot;道&quot;, &quot;塔&quot;, &quot;硕&quot;,
+                             &quot;塞&quot;, &quot;衡&quot;, &quot;衣&quot;, &quot;桥&quot;, &quot;令狐&quot;, &quot;表&quot;,
+                             &quot;恭&quot;, &quot;偶&quot;, &quot;衷&quot;, &quot;项&quot;, &quot;须&quot;, &quot;恽&quot;, &quot;顾&quot;, &quot;顿&quot;, &quot;袁&quot;, &quot;梁&quot;, &quot;漆雕&quot;, &quot;东欧&quot;, &quot;傅&quot;, &quot;梅&quot;,
+                             &quot;肇&quot;, &quot;悉&quot;, &quot;夏侯&quot;, &quot;频&quot;, &quot;邓&quot;, &quot;邗&quot;, &quot;邛&quot;,
+                             &quot;颜&quot;, &quot;邝&quot;, &quot;悟&quot;, &quot;邢&quot;, &quot;那&quot;, &quot;肥&quot;, &quot;碧&quot;, &quot;储&quot;, &quot;墨&quot;, &quot;邬&quot;, &quot;袭&quot;, &quot;邰&quot;, &quot;邱&quot;, &quot;邴&quot;, &quot;邵&quot;,
+                             &quot;邶&quot;, &quot;邸&quot;, &quot;邹&quot;, &quot;检&quot;, &quot;郁&quot;, &quot;郎&quot;,
+                             &quot;风&quot;, &quot;郏&quot;, &quot;郑&quot;, &quot;裔&quot;, &quot;郗&quot;, &quot;裘&quot;, &quot;郜&quot;, &quot;郝&quot;, &quot;飞&quot;, &quot;烟&quot;, &quot;惠&quot;, &quot;胡&quot;, &quot;胥&quot;, &quot;郦&quot;, &quot;第五&quot;,
+                             &quot;僧&quot;, &quot;磨&quot;, &quot;僪&quot;, &quot;士&quot;, &quot;壬&quot;, &quot;郭&quot;,
+                             &quot;钟离&quot;, &quot;森&quot;, &quot;郯&quot;, &quot;声&quot;, &quot;裴&quot;, &quot;郸&quot;, &quot;能&quot;, &quot;都&quot;, &quot;鄂&quot;, &quot;愈&quot;, &quot;焉&quot;, &quot;植&quot;, &quot;夏&quot;, &quot;褒&quot;, &quot;夔&quot;,
+                             &quot;夕&quot;, &quot;夙&quot;, &quot;褚&quot;, &quot;多&quot;, &quot;愚&quot;, &quot;鄞&quot;,
+                             &quot;鄢&quot;, &quot;焦&quot;, &quot;大&quot;, &quot;天&quot;, &quot;夫&quot;, &quot;脱&quot;, &quot;夷&quot;, &quot;示&quot;, &quot;礼&quot;, &quot;祁&quot;, &quot;允&quot;, &quot;元&quot;, &quot;充&quot;, &quot;酆&quot;, &quot;兆&quot;,
+                             &quot;奇&quot;, &quot;祈&quot;, &quot;奈&quot;, &quot;慈&quot;, &quot;奉&quot;, &quot;光&quot;,
+                             &quot;慎&quot;, &quot;段干&quot;, &quot;酒&quot;, &quot;慕&quot;, &quot;奕&quot;, &quot;祖&quot;, &quot;奚&quot;, &quot;党&quot;, &quot;楚&quot;, &quot;祝&quot;, &quot;祢&quot;, &quot;全&quot;, &quot;公&quot;, &quot;祭&quot;, &quot;六&quot;,
+                             &quot;兰&quot;, &quot;关&quot;, &quot;兴&quot;, &quot;饶&quot;, &quot;其&quot;, &quot;典&quot;,
+                             &quot;养&quot;, &quot;楼&quot;, &quot;腾&quot;, &quot;冀&quot;, &quot;覃&quot;, &quot;禄&quot;, &quot;冉&quot;, &quot;熊&quot;, &quot;福&quot;, &quot;冒&quot;, &quot;首&quot;, &quot;禚&quot;, &quot;军&quot;, &quot;农&quot;, &quot;妫&quot;,
+                             &quot;冯&quot;, &quot;况&quot;, &quot;冷&quot;, &quot;禹&quot;, &quot;冼&quot;, &quot;禽&quot;,
+                             &quot;禾&quot;, &quot;释&quot;, &quot;秋&quot;, &quot;始&quot;, &quot;凌&quot;, &quot;种&quot;, &quot;野&quot;, &quot;金&quot;, &quot;姒&quot;, &quot;姓&quot;, &quot;委&quot;, &quot;燕&quot;, &quot;秘&quot;, &quot;姚&quot;, &quot;姜&quot;,
+                             &quot;解&quot;, &quot;凤&quot;, &quot;秦&quot;, &quot;臧&quot;, &quot;巫马&quot;, &quot;姬&quot;,
+                             &quot;凭&quot;, &quot;呼延&quot;, &quot;称&quot;, &quot;出&quot;, &quot;函&quot;, &quot;言&quot;, &quot;刀&quot;, &quot;刁&quot;, &quot;威&quot;, &quot;娄&quot;, &quot;舄&quot;, &quot;戈&quot;, &quot;樊&quot;, &quot;戊&quot;, &quot;程&quot;,
+                             &quot;戎&quot;, &quot;税&quot;, &quot;戏&quot;, &quot;成&quot;, &quot;刑&quot;, &quot;舒&quot;,
+                             &quot;夹谷&quot;, &quot;端木&quot;, &quot;刘&quot;, &quot;战&quot;, &quot;戚&quot;, &quot;刚&quot;, &quot;舜&quot;, &quot;初&quot;, &quot;戢&quot;, &quot;利&quot;, &quot;别&quot;, &quot;爱&quot;, &quot;戴&quot;, &quot;步都&quot;,
+                             &quot;户&quot;, &quot;稽&quot;, &quot;訾&quot;, &quot;房&quot;, &quot;所&quot;, &quot;穆&quot;, &quot;扈&quot;,
+                             &quot;前&quot;, &quot;才&quot;, &quot;剑&quot;, &quot;牛&quot;, &quot;牟&quot;, &quot;牢&quot;, &quot;牧&quot;, &quot;剧&quot;, &quot;马&quot;, &quot;扬&quot;, &quot;良&quot;, &quot;穰&quot;, &quot;牵&quot;, &quot;扶&quot;, &quot;詹&quot;,
+                             &quot;驹&quot;, &quot;空&quot;, &quot;艾&quot;, &quot;承&quot;, &quot;檀&quot;, &quot;犁&quot;,
+                             &quot;节&quot;, &quot;抄&quot;, &quot;骆&quot;, &quot;司徒&quot;, &quot;骑&quot;, &quot;芒&quot;, &quot;抗&quot;, &quot;折&quot;, &quot;力&quot;, &quot;功&quot;, &quot;务&quot;, &quot;窦&quot;, &quot;芮&quot;, &quot;仲孙&quot;,
+                             &quot;花&quot;, &quot;万俟&quot;, &quot;励&quot;, &quot;劳&quot;, &quot;犹&quot;, &quot;势&quot;, &quot;狂&quot;,
+                             &quot;狄&quot;, &quot;勇&quot;, &quot;苌&quot;, &quot;苍&quot;, &quot;苏&quot;, &quot;苑&quot;, &quot;苗&quot;, &quot;高&quot;, &quot;招&quot;, &quot;拜&quot;, &quot;苟&quot;, &quot;章&quot;, &quot;勤&quot;, &quot;童&quot;, &quot;苦&quot;,
+                             &quot;宇文&quot;, &quot;独&quot;, &quot;竭&quot;, &quot;端&quot;, &quot;拱&quot;, &quot;英&quot;,
+                             &quot;竹&quot;, &quot;竺&quot;, &quot;勾&quot;, &quot;百里&quot;, &quot;茂&quot;, &quot;范&quot;, &quot;笃&quot;, &quot;茅&quot;, &quot;包&quot;, &quot;茆&quot;, &quot;謇&quot;, &quot;欎&quot;, &quot;荔菲&quot;, &quot;东方&quot;,
+                             &quot;化&quot;, &quot;北&quot;, &quot;匡&quot;, &quot;次&quot;, &quot;符&quot;, &quot;笪&quot;, &quot;第&quot;,
+                             &quot;嬴&quot;, &quot;茹&quot;, &quot;辗迟&quot;, &quot;区&quot;, &quot;谷梁&quot;, &quot;微生&quot;, &quot;南宫&quot;, &quot;荀&quot;, &quot;千&quot;, &quot;荆&quot;, &quot;东门&quot;, &quot;华&quot;, &quot;魏&quot;,
+                             &quot;卑&quot;, &quot;卓&quot;, &quot;孔&quot;, &quot;答&quot;, &quot;单&quot;, &quot;字&quot;, &quot;南&quot;,
+                             &quot;孙&quot;, &quot;澹台&quot;, &quot;孛&quot;, &quot;卜&quot;, &quot;孝&quot;, &quot;卞&quot;, &quot;孟&quot;, &quot;占&quot;, &quot;卢&quot;, &quot;止&quot;, &quot;季&quot;, &quot;荣&quot;, &quot;荤&quot;, &quot;步&quot;, &quot;武&quot;,
+                             &quot;学&quot;, &quot;歧&quot;, &quot;卫&quot;, &quot;卯&quot;, &quot;印&quot;, &quot;危&quot;,
+                             &quot;却&quot;, &quot;捷&quot;, &quot;卷&quot;, &quot;卿&quot;, &quot;简&quot;, &quot;宁&quot;, &quot;玄&quot;, &quot;宇&quot;, &quot;守&quot;, &quot;安&quot;, &quot;厉&quot;, &quot;玉&quot;, &quot;王&quot;, &quot;宋&quot;, &quot;掌&quot;,
+                             &quot;完&quot;, &quot;厍&quot;, &quot;宏&quot;, &quot;宓&quot;, &quot;公羊&quot;, &quot;箕&quot;,
+                             &quot;宗&quot;, &quot;莘&quot;, &quot;官&quot;, &quot;定&quot;, &quot;厚&quot;, &quot;宛&quot;, &quot;宜&quot;, &quot;宝&quot;, &quot;实&quot;, &quot;原&quot;, &quot;计&quot;, &quot;管&quot;, &quot;宣&quot;, &quot;接&quot;, &quot;宦&quot;,
+                             &quot;让&quot;, &quot;莫&quot;, &quot;宫&quot;, &quot;环&quot;, &quot;宰&quot;, &quot;莱&quot;,
+                             &quot;殳&quot;, &quot;殴&quot;, &quot;段&quot;, &quot;家&quot;, &quot;殷&quot;, &quot;许&quot;, &quot;容&quot;, &quot;宿&quot;, &quot;菅&quot;, &quot;寇&quot;, &quot;及&quot;, &quot;毋&quot;, &quot;空曾&quot;, &quot;友&quot;, &quot;富&quot;,
+                             &quot;双&quot;, &quot;羊舌&quot;, &quot;母&quot;, &quot;寒&quot;, &quot;毓&quot;, &quot;锺离&quot;,
+                             &quot;叔&quot;, &quot;毕&quot;, &quot;受&quot;, &quot;诗&quot;, &quot;毛&quot;, &quot;古&quot;, &quot;召&quot;, &quot;班&quot;, &quot;揭&quot;, &quot;可&quot;, &quot;台&quot;, &quot;史&quot;, &quot;说&quot;, &quot;叶&quot;, &quot;诸&quot;,
+                             &quot;司&quot;, &quot;寸&quot;, &quot;诺&quot;, &quot;寻&quot;, &quot;寿&quot;, &quot;封&quot;,
+                             &quot;将&quot;, &quot;理&quot;, &quot;谈&quot;, &quot;合&quot;, &quot;吉&quot;, &quot;尉&quot;, &quot;濮阳&quot;, &quot;同&quot;, &quot;谌&quot;, &quot;后&quot;, &quot;谏&quot;, &quot;向&quot;, &quot;少&quot;, &quot;尔&quot;, &quot;吕&quot;,
+                             &quot;尚&quot;, &quot;谢&quot;, &quot;尤&quot;, &quot;营&quot;, &quot;琦&quot;, &quot;萧&quot;,
+                             &quot;尧&quot;, &quot;萨&quot;, &quot;谬&quot;, &quot;谭&quot;, &quot;谯&quot;, &quot;吴&quot;, &quot;水&quot;, &quot;琴&quot;, &quot;谷&quot;, &quot;永&quot;, &quot;尹&quot;, &quot;尾&quot;, &quot;吾&quot;, &quot;局&quot;, &quot;求&quot;,
+                             &quot;居&quot;, &quot;豆&quot;, &quot;屈&quot;, &quot;汉&quot;, &quot;告&quot;, &quot;籍&quot;,
+                             &quot;展&quot;, &quot;汗&quot;, &quot;西门&quot;, &quot;员&quot;, &quot;葛&quot;, &quot;汝&quot;, &quot;瑞&quot;, &quot;江&quot;, &quot;屠&quot;, &quot;池&quot;, &quot;象&quot;, &quot;董&quot;, &quot;汤&quot;, &quot;周&quot;, &quot;摩&quot;,
+                             &quot;汪&quot;, &quot;山&quot;, &quot;汲&quot;, &quot;米&quot;, &quot;类&quot;, &quot;鱼&quot;,
+                             &quot;呼&quot;, &quot;鲁&quot;, &quot;沃&quot;, &quot;宗政&quot;, &quot;沈&quot;, &quot;针&quot;, &quot;蒉&quot;, &quot;钊&quot;, &quot;貊&quot;, &quot;蒋&quot;, &quot;和&quot;, &quot;鲍&quot;, &quot;宰父&quot;, &quot;咎&quot;,
+                             &quot;沐&quot;, &quot;岑&quot;, &quot;撒&quot;, &quot;粘&quot;, &quot;蒙&quot;, &quot;沙&quot;, &quot;鲜&quot;,
+                             &quot;钞&quot;, &quot;钟&quot;, &quot;粟&quot;, &quot;钦&quot;, &quot;璩&quot;, &quot;钭&quot;, &quot;钮&quot;, &quot;蒯&quot;, &quot;钱&quot;, &quot;蒲&quot;, &quot;岳&quot;, &quot;咸&quot;, &quot;蒿&quot;, &quot;哀&quot;, &quot;铁&quot;,
+                             &quot;哈&quot;, &quot;泉&quot;, &quot;操&quot;, &quot;铎&quot;, &quot;法&quot;, &quot;糜&quot;,
+                             &quot;蓝&quot;, &quot;蓟&quot;, &quot;波&quot;, &quot;泣&quot;, &quot;泥&quot;, &quot;蓬&quot;, &quot;瓮&quot;, &quot;泰&quot;, &quot;银&quot;, &quot;泷&quot;, &quot;左丘&quot;, &quot;系&quot;, &quot;尉迟&quot;, &quot;锁&quot;,
+                             &quot;甄&quot;, &quot;崇&quot;, &quot;慕容&quot;, &quot;洋&quot;, &quot;唐&quot;, &quot;锐&quot;, &quot;崔&quot;,
+                             &quot;甘&quot;, &quot;错&quot;, &quot;蔚&quot;, &quot;洛&quot;, &quot;贝&quot;, &quot;生&quot;, &quot;素&quot;, &quot;蔡&quot;, &quot;贡&quot;, &quot;索&quot;, &quot;用&quot;, &quot;洪&quot;, &quot;甫&quot;, &quot;紫&quot;, &quot;支&quot;,
+                             &quot;贯&quot;, &quot;田&quot;, &quot;贰&quot;, &quot;唱&quot;, &quot;由&quot;, &quot;贲&quot;,
+                             &quot;甲&quot;, &quot;申&quot;, &quot;贵&quot;, &quot;贸&quot;, &quot;费&quot;, &quot;改&quot;, &quot;贺&quot;, &quot;蔺&quot;, &quot;贾&quot;, &quot;资&quot;, &quot;畅&quot;, &quot;商&quot;, &quot;嵇&quot;, &quot;镇&quot;, &quot;赏&quot;,
+                             &quot;敏&quot;, &quot;浑&quot;, &quot;拓跋&quot;, &quot;赖&quot;, &quot;敖&quot;, &quot;留&quot;,
+                             &quot;赛&quot;, &quot;敛&quot;, &quot;镜&quot;, &quot;轩辕&quot;, &quot;鲜于&quot;, &quot;赤&quot;, &quot;浦&quot;, &quot;赧&quot;, &quot;赫&quot;, &quot;敬&quot;, &quot;浮&quot;, &quot;赵&quot;, &quot;海&quot;, &quot;南门&quot;,
+                             &quot;司马&quot;, &quot;蕾&quot;, &quot;长&quot;, &quot;涂&quot;, &quot;申屠&quot;, &quot;薄&quot;,
+                             &quot;善&quot;, &quot;文&quot;, &quot;司空&quot;, &quot;越&quot;, &quot;斋&quot;, &quot;疏&quot;, &quot;斐&quot;, &quot;公西&quot;, &quot;薛&quot;, &quot;斛&quot;, &quot;喜&quot;, &quot;綦&quot;, &quot;长孙&quot;, &quot;斯&quot;,
+                             &quot;方&quot;, &quot;喻&quot;, &quot;梁丘&quot;, &quot;於&quot;, &quot;施&quot;, &quot;公冶&quot;,
+                             &quot;旁&quot;, &quot;旅&quot;, &quot;藏&quot;, &quot;单于&quot;, &quot;旗&quot;, &quot;无&quot;, &quot;淡&quot;, &quot;巢&quot;, &quot;藤&quot;, &quot;左&quot;, &quot;淦&quot;, &quot;巧&quot;, &quot;门&quot;, &quot;巨&quot;, &quot;巩&quot;,
+                             &quot;藩&quot;, &quot;闪&quot;, &quot;巫&quot;, &quot;闫&quot;, &quot;闭&quot;, &quot;问&quot;,
+                             &quot;路&quot;, &quot;己&quot;, &quot;闳&quot;, &quot;巴&quot;, &quot;闵&quot;, &quot;时&quot;, &quot;旷&quot;, &quot;闻&quot;, &quot;闽&quot;, &quot;闾&quot;, &quot;丁&quot;, &quot;昂&quot;, &quot;市&quot;, &quot;布&quot;, &quot;帅&quot;,
+                             &quot;清&quot;, &quot;万&quot;, &quot;师&quot;, &quot;嘉&quot;, &quot;昌&quot;, &quot;颛孙&quot;,
+                             &quot;希&quot;, &quot;不&quot;, &quot;明&quot;, &quot;阎&quot;, &quot;丑&quot;, &quot;易&quot;, &quot;昔&quot;, &quot;帖&quot;, &quot;世&quot;, &quot;壤驷&quot;, &quot;丘&quot;, &quot;阙&quot;, &quot;丙&quot;, &quot;阚&quot;, &quot;业&quot;,
+                             &quot;丛&quot;, &quot;帛&quot;, &quot;东&quot;, &quot;昝&quot;, &quot;子车&quot;, &quot;星&quot;,
+                             &quot;渠&quot;, &quot;严&quot;, &quot;春&quot;, &quot;温&quot;, &quot;席&quot;, &quot;中&quot;, &quot;阮&quot;, &quot;是&quot;, &quot;丰&quot;, &quot;聂晁&quot;, &quot;阳&quot;, &quot;阴&quot;, &quot;常&quot;, &quot;游&quot;, &quot;丹&quot;,
+                             &quot;阿&quot;, &quot;陀&quot;, &quot;晁&quot;, &quot;繁&quot;, &quot;陆&quot;, &quot;蹇&quot;,
+                             &quot;陈&quot;, &quot;么&quot;, &quot;蹉&quot;, &quot;义&quot;, &quot;晋&quot;, &quot;之&quot;, &quot;乌&quot;, &quot;虎&quot;, &quot;晏&quot;, &quot;乐&quot;, &quot;乔&quot;, &quot;乘&quot;, &quot;乙&quot;, &quot;湛&quot;, &quot;东郭&quot;,
+                             &quot;乜&quot;, &quot;九&quot;, &quot;虞&quot;, &quot;习&quot;, &quot;虢&quot;, &quot;书&quot;,
+                             &quot;普&quot;, &quot;景&quot;, &quot;买&quot;, &quot;干&quot;, &quot;平&quot;, &quot;年&quot;, &quot;陶&quot;, &quot;幸&quot;, &quot;智&quot;, &quot;登&quot;, &quot;白&quot;, &quot;百&quot;, &quot;乾&quot;, &quot;广&quot;, &quot;鹿&quot;,
+                             &quot;蚁&quot;, &quot;庄&quot;, &quot;隆&quot;, &quot;庆&quot;, &quot;皇&quot;, &quot;公良&quot;,
+                             &quot;皋&quot;, &quot;隋&quot;, &quot;于&quot;, &quot;随&quot;, &quot;源&quot;, &quot;隐&quot;, &quot;云&quot;, &quot;亓&quot;, &quot;库&quot;, &quot;应&quot;, &quot;五&quot;, &quot;井&quot;, &quot;隗&quot;, &quot;庚&quot;, &quot;府&quot;,
+                             &quot;庞&quot;, &quot;红&quot;, &quot;亢&quot;, &quot;亥&quot;, &quot;度&quot;, &quot;麦&quot;,
+                             &quot;暨&quot;, &quot;纪&quot;, &quot;京&quot;, &quot;皮&quot;, &quot;纳&quot;, &quot;麴&quot;, &quot;暴&quot;, &quot;纵&quot;, &quot;康&quot;, &quot;庹&quot;, &quot;麻&quot;, &quot;隽&quot;, &quot;庾&quot;, &quot;线&quot;, &quot;雀&quot;,
+                             &quot;仁&quot;, &quot;练&quot;, &quot;黄&quot;, &quot;司寇&quot;, &quot;集&quot;, &quot;仆&quot;,
+                             &quot;仇&quot;, &quot;上官&quot;, &quot;终&quot;, &quot;盈&quot;, &quot;廉&quot;, &quot;仉&quot;, &quot;益&quot;, &quot;介&quot;, &quot;雍&quot;, &quot;盍&quot;, &quot;绍&quot;, &quot;仍&quot;, &quot;黎&quot;, &quot;从&quot;, &quot;经&quot;,
+                             &quot;滑&quot;, &quot;滕&quot;, &quot;廖&quot;, &quot;盖&quot;, &quot;盘&quot;, &quot;付&quot;,
+                             &quot;仙&quot;, &quot;盛&quot;, &quot;仝&quot;, &quot;回&quot;, &quot;满&quot;, &quot;代&quot;, &quot;令&quot;, &quot;以&quot;, &quot;绪&quot;, &quot;雪&quot;, &quot;仪&quot;, &quot;续&quot;, &quot;蛮&quot;, &quot;仰&quot;, &quot;仲&quot;,
+                             &quot;曲&quot;, &quot;绳&quot;, &quot;仵&quot;, &quot;淳于&quot;, &quot;延&quot;, &quot;零&quot;,
+                             &quot;雷&quot;, &quot;相&quot;, &quot;曹&quot;, &quot;建&quot;, &quot;任&quot;, &quot;国&quot;, &quot;曾&quot;, &quot;开&quot;, &quot;漆&quot;, &quot;有&quot;, &quot;伊&quot;, &quot;朋&quot;, &quot;伍&quot;, &quot;霍&quot;, &quot;伏&quot;,
+                             &quot;缑&quot;, &quot;休&quot;, &quot;弓&quot;, &quot;弘&quot;, &quot;乐正&quot;, &quot;望&quot;,
+                             &quot;霜&quot;, &quot;真&quot;, &quot;伟&quot;, &quot;张&quot;, &quot;圣&quot;, &quot;弥&quot;, &quot;伦&quot;, &quot;在&quot;, &quot;缪&quot;, &quot;漫&quot;, &quot;本&quot;, &quot;圭&quot;, &quot;弭&quot;, &quot;眭&quot;, &quot;伯&quot;,
+                             &quot;朱&quot;, &quot;朴&quot;, &quot;凃肖&quot;, &quot;强&quot;, &quot;机&quot;, &quot;似&quot;,
+                             &quot;权&quot;, &quot;但&quot;, &quot;位&quot;, &quot;李&quot;, &quot;齐&quot;, &quot;归&quot;, &quot;青&quot;, &quot;何&quot;, &quot;罕&quot;, &quot;靖&quot;, &quot;罗&quot;, &quot;潘&quot;, &quot;佘&quot;, &quot;余&quot;, &quot;坚&quot;,
+                             &quot;佛&quot;, &quot;杜&quot;, &quot;潜&quot;, &quot;杞&quot;, &quot;束&quot;, &quot;佟&quot;,
+                             &quot;睢&quot;, &quot;督&quot;, &quot;彤&quot;, &quot;来&quot;, &quot;车&quot;, &quot;睦&quot;, &quot;公孙&quot;, &quot;杨&quot;, &quot;革&quot;, &quot;亓官&quot;, &quot;彭&quot;, &quot;杭&quot;, &quot;潭&quot;, &quot;潮&quot;,
+                             &quot;诸葛&quot;, &quot;靳&quot;, &quot;佴&quot;, &quot;佼&quot;, &quot;载&quot;, &quot;松&quot;, &quot;板&quot;,
+                             &quot;澄&quot;, &quot;辉&quot;, &quot;羊&quot;, &quot;皇甫&quot;, &quot;律&quot;, &quot;後&quot;, &quot;融&quot;, &quot;侍&quot;, &quot;徐&quot;, &quot;析&quot;, &quot;林&quot;, &quot;龙&quot;, &quot;龚&quot;, &quot;枚&quot;, &quot;辛&quot;,
+                             &quot;辜&quot;, &quot;枝&quot;, &quot;依&quot;, &quot;辟&quot;, &quot;鞠&quot;, &quot;御&quot;,
+                             &quot;侨&quot;, &quot;徭&quot;, &quot;侯&quot;, &quot;德&quot;, &quot;边&quot;, &quot;羽&quot;, &quot;达&quot;, &quot;羿&quot;, &quot;瞿&quot;, &quot;翁&quot;, &quot;赫连&quot;, &quot;过&quot;, &quot;闾丘&quot;, &quot;俎&quot;,
+                             &quot;城&quot;, &quot;柏&quot;, &quot;运&quot;, &quot;柔&quot;, &quot;进&quot;, &quot;保&quot;, &quot;俞&quot;,
+                             &quot;连&quot;, &quot;翟&quot;, &quot;俟&quot;, &quot;迟&quot;, &quot;翠&quot;, &quot;欧阳&quot;, &quot;太叔&quot;, &quot;信&quot;, &quot;相查&quot;, &quot;查&quot;, &quot;韦&quot;, &quot;翦&quot;, &quot;韩&quot;, &quot;矫&quot;,
+                             &quot;濮&quot;, &quot;修&quot;, &quot;迮&quot;, &quot;柯&quot;, &quot;濯&quot;, &quot;柳&quot;, &quot;石&quot;,
+                             &quot;柴&quot;, &quot;念&quot;, &quot;韶&quot;, &quot;忻&quot;, &quot;陕&quot;, &quot;部&quot;, &quot;凡&quot;, &quot;肖&quot;, &quot;欧&quot; };
+<span class="nc" id="L116">        return Lists.newArrayList(surname);</span>
+    }
+
+    public static List&lt;String&gt; getFemaleList() {
+<span class="nc" id="L120">        String[] name = { &quot;洁&quot;, &quot;霄&quot;, &quot;娅&quot;, &quot;月&quot;, &quot;嘉&quot;, &quot;眉&quot;, &quot;伊&quot;, &quot;希&quot;, &quot;萍&quot;, &quot;舒&quot;, &quot;茗&quot;, &quot;君&quot;, &quot;娜&quot;, &quot;茜&quot;, &quot;思&quot;,</span>
+                          &quot;霞&quot;, &quot;贞&quot;, &quot;娟&quot;, &quot;真&quot;,
+                          &quot;素&quot;, &quot;怡&quot;, &quot;欢&quot;, &quot;娣&quot;, &quot;欣&quot;, &quot;娥&quot;, &quot;春&quot;, &quot;琦&quot;, &quot;锦&quot;, &quot;倩&quot;, &quot;琬&quot;, &quot;昭&quot;, &quot;霭&quot;, &quot;琰&quot;, &quot;爱&quot;,
+                          &quot;露&quot;, &quot;琳&quot;, &quot;娴&quot;, &quot;琴&quot;, &quot;丹&quot;, &quot;琼&quot;,
+                          &quot;爽&quot;, &quot;丽&quot;, &quot;桂&quot;, &quot;婉&quot;, &quot;蕊&quot;, &quot;华&quot;, &quot;青&quot;, &quot;晓&quot;, &quot;荔&quot;, &quot;婕&quot;, &quot;瑗&quot;, &quot;静&quot;, &quot;瑞&quot;, &quot;筠&quot;, &quot;荣&quot;,
+                          &quot;慧&quot;, &quot;彩&quot;, &quot;聪&quot;, &quot;兰&quot;, &quot;影&quot;, &quot;艳&quot;,
+                          &quot;佳&quot;, &quot;婵&quot;, &quot;晶&quot;, &quot;瑶&quot;, &quot;婷&quot;, &quot;荷&quot;, &quot;艺&quot;, &quot;瑾&quot;, &quot;卿&quot;, &quot;宁&quot;, &quot;梅&quot;, &quot;薇&quot;, &quot;玉&quot;, &quot;莉&quot;, &quot;妍&quot;,
+                          &quot;融&quot;, &quot;美&quot;, &quot;莎&quot;, &quot;咏&quot;, &quot;璐&quot;, &quot;云&quot;,
+                          &quot;颖&quot;, &quot;香&quot;, &quot;岚&quot;, &quot;亚&quot;, &quot;媛&quot;, &quot;澜&quot;, &quot;宜&quot;, &quot;芝&quot;, &quot;枝&quot;, &quot;红&quot;, &quot;馥&quot;, &quot;梦&quot;, &quot;悦&quot;, &quot;璧&quot;, &quot;纨&quot;,
+                          &quot;馨&quot;, &quot;枫&quot;, &quot;芬&quot;, &quot;环&quot;, &quot;纯&quot;, &quot;冰&quot;,
+                          &quot;玲&quot;, &quot;莲&quot;, &quot;育&quot;, &quot;芳&quot;, &quot;芸&quot;, &quot;妹&quot;, &quot;莺&quot;, &quot;羽&quot;, &quot;秀&quot;, &quot;雁&quot;, &quot;菁&quot;, &quot;雅&quot;, &quot;蓉&quot;, &quot;菊&quot;, &quot;珊&quot;,
+                          &quot;秋&quot;, &quot;珍&quot;, &quot;淑&quot;, &quot;苑&quot;, &quot;寒&quot;, &quot;蓓&quot;,
+                          &quot;毓&quot;, &quot;柔&quot;, &quot;燕&quot;, &quot;飘&quot;, &quot;黛&quot;, &quot;凝&quot;, &quot;惠&quot;, &quot;珠&quot;, &quot;翠&quot;, &quot;凡&quot;, &quot;滢&quot;, &quot;姣&quot;, &quot;凤&quot;, &quot;勤&quot;, &quot;巧&quot;,
+                          &quot;雪&quot;, &quot;仪&quot;, &quot;姬&quot;, &quot;园&quot;, &quot;可&quot;, &quot;英&quot;,
+                          &quot;菲&quot;, &quot;韵&quot;, &quot;叶&quot;, &quot;竹&quot; };
+<span class="nc" id="L135">        return Lists.newArrayList(name);</span>
+    }
+
+    public static List&lt;String&gt; getMaleList() {
+<span class="nc" id="L139">        String[] name = { &quot;言&quot;, &quot;茂&quot;, &quot;清&quot;, &quot;震&quot;, &quot;有&quot;, &quot;朋&quot;, &quot;栋&quot;, &quot;昌&quot;, &quot;明&quot;, &quot;成&quot;, &quot;民&quot;, &quot;树&quot;, &quot;世&quot;, &quot;朗&quot;, &quot;弘&quot;,</span>
+                          &quot;刚&quot;, &quot;会&quot;, &quot;琛&quot;, &quot;东&quot;,
+                          &quot;思&quot;, &quot;伟&quot;, &quot;生&quot;, &quot;星&quot;, &quot;鸣&quot;, &quot;谦&quot;, &quot;伦&quot;, &quot;利&quot;, &quot;天&quot;, &quot;航&quot;, &quot;中&quot;, &quot;振&quot;, &quot;伯&quot;, &quot;启&quot;, &quot;贵&quot;,
+                          &quot;永&quot;, &quot;强&quot;, &quot;政&quot;, &quot;元&quot;, &quot;奇&quot;, &quot;先&quot;,
+                          &quot;义&quot;, &quot;光&quot;, &quot;之&quot;, &quot;克&quot;, &quot;行&quot;, &quot;才&quot;, &quot;鹏&quot;, &quot;子&quot;, &quot;乐&quot;, &quot;策&quot;, &quot;坚&quot;, &quot;博&quot;, &quot;江&quot;, &quot;楠&quot;, &quot;健&quot;,
+                          &quot;祥&quot;, &quot;学&quot;, &quot;武&quot;, &quot;全&quot;, &quot;晨&quot;, &quot;浩&quot;,
+                          &quot;彪&quot;, &quot;豪&quot;, &quot;彬&quot;, &quot;敬&quot;, &quot;轮&quot;, &quot;良&quot;, &quot;杰&quot;, &quot;山&quot;, &quot;平&quot;, &quot;兴&quot;, &quot;海&quot;, &quot;顺&quot;, &quot;松&quot;, &quot;腾&quot;, &quot;广&quot;,
+                          &quot;承&quot;, &quot;宁&quot;, &quot;梁&quot;, &quot;善&quot;, &quot;超&quot;, &quot;庆&quot;,
+                          &quot;文&quot;, &quot;辉&quot;, &quot;安&quot;, &quot;和&quot;, &quot;斌&quot;, &quot;炎&quot;, &quot;福&quot;, &quot;宏&quot;, &quot;榕&quot;, &quot;林&quot;, &quot;龙&quot;, &quot;厚&quot;, &quot;军&quot;, &quot;力&quot;, &quot;涛&quot;,
+                          &quot;功&quot;, &quot;冠&quot;, &quot;群&quot;, &quot;邦&quot;, &quot;钧&quot;, &quot;亨&quot;,
+                          &quot;岩&quot;, &quot;亮&quot;, &quot;新&quot;, &quot;辰&quot;, &quot;河&quot;, &quot;家&quot;, &quot;康&quot;, &quot;德&quot;, &quot;达&quot;, &quot;仁&quot;, &quot;心&quot;, &quot;雄&quot;, &quot;毅&quot;, &quot;勇&quot;, &quot;俊&quot;,
+                          &quot;磊&quot;, &quot;友&quot;, &quot;富&quot;, &quot;绍&quot;, &quot;风&quot;, &quot;发&quot;,
+                          &quot;翔&quot;, &quot;裕&quot;, &quot;志&quot;, &quot;诚&quot;, &quot;进&quot;, &quot;盛&quot;, &quot;胜&quot;, &quot;保&quot;, &quot;飞&quot;, &quot;信&quot;, &quot;波&quot;, &quot;若&quot;, &quot;以&quot;, &quot;士&quot;, &quot;旭&quot;,
+                          &quot;壮&quot;, &quot;峰&quot;, &quot;翰&quot;, &quot;泰&quot;, &quot;哲&quot;, &quot;维&quot;,
+                          &quot;致&quot;, &quot;时&quot;, &quot;固&quot;, &quot;建&quot;, &quot;国&quot;, &quot;泽&quot; };
+<span class="nc" id="L154">        return Lists.newArrayList(name);</span>
+    }
+
+    public static String getName() {
+
+<span class="nc" id="L159">        List&lt;String&gt; surnameList = getSurnameList();</span>
+<span class="nc" id="L160">        List&lt;String&gt; girl = getFemaleList();</span>
+<span class="nc" id="L161">        List&lt;String&gt; boy = getMaleList();</span>
+
+        // 获得一个随机的姓氏
+<span class="nc" id="L164">        int index = RandomUtils.nextInt(0, surnameList.size());</span>
+<span class="nc" id="L165">        String name = surnameList.get(index);</span>
+
+        // 可以根据这个数设置产生的男女比例
+<span class="nc" id="L168">        int i = RandomUtils.nextInt(0, 3);</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        if (i == 2) {</span>
+<span class="nc" id="L170">            int j = RandomUtils.nextInt(0, girl.size() - 1);</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">            if (j % 2 == 0) {</span>
+                // 女
+<span class="nc" id="L173">                name = name + girl.get(j) + girl.get(j + 1);</span>
+            } else {
+<span class="nc" id="L175">                name = name + girl.get(j);</span>
+            }
+<span class="nc" id="L177">        } else {</span>
+<span class="nc" id="L178">            int j = RandomUtils.nextInt(0, boy.size() - 1);</span>
+            // 男
+<span class="nc bnc" id="L180" title="All 2 branches missed.">            if (j % 2 == 0) {</span>
+<span class="nc" id="L181">                name = name + boy.get(j) + boy.get(j + 1);</span>
+            } else {
+<span class="nc" id="L183">                name = name + boy.get(j);</span>
+            }
+        }
+
+<span class="nc" id="L187">        return name;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

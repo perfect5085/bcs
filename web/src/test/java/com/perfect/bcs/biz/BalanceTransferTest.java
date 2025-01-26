@@ -23,6 +23,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,7 +48,7 @@ public class BalanceTransferTest {
 
     ExecutorService executor = Executors.newFixedThreadPool(10);
 
-    //@Test
+    @Test
     public void testTransferByConcurrency() throws Throwable {
 
         LambdaQueryWrapper<AccountInfoDO> wrapper = new LambdaQueryWrapper<>();
@@ -173,7 +174,7 @@ public class BalanceTransferTest {
         }
     }
 
-    //@Test
+    @Test
     public void testChangeBalanceByOrder() throws Throwable {
 
         LambdaQueryWrapper<AccountInfoDO> wrapper = new LambdaQueryWrapper<>();

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwaggerConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.web.config</a> &gt; <span class="el_source">SwaggerConfig.java</span></div><h1>SwaggerConfig.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.web.config;
+
+import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
+import com.google.common.base.Predicate;
+import io.swagger.annotations.Api;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.web.bind.annotation.RestController;
+import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
+import springfox.documentation.RequestHandler;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+@Configuration
+@EnableSwagger2WebMvc
+@EnableKnife4j
+@Import(BeanValidatorPluginsConfiguration.class)
+<span class="fc" id="L30">public class SwaggerConfig {</span>
+
+    @Bean
+    public Docket createRestApi() {
+<span class="fc" id="L34">        Predicate&lt;RequestHandler&gt; predicate = (input) -&gt; {</span>
+
+<span class="fc" id="L36">            Class&lt;?&gt; declaringClass = input.declaringClass();</span>
+
+            // 被注解的类
+<span class="fc bfc" id="L39" title="All 2 branches covered.">            if (declaringClass.isAnnotationPresent(RestController.class)</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">                &amp;&amp; declaringClass.isAnnotationPresent(Api.class)) {</span>
+<span class="fc" id="L41">                return true;</span>
+            }
+
+<span class="fc" id="L44">            return false;</span>
+
+        };
+
+<span class="fc" id="L48">        Docket docket = new Docket(DocumentationType.SWAGGER_2);</span>
+<span class="fc" id="L49">        docket.apiInfo(apiInfo());</span>
+<span class="fc" id="L50">        docket.useDefaultResponseMessages(false);</span>
+
+<span class="fc" id="L52">        ApiSelectorBuilder apiSelectorBuilder = docket.select();</span>
+<span class="fc" id="L53">        apiSelectorBuilder.apis(predicate);</span>
+<span class="fc" id="L54">        apiSelectorBuilder.apis(RequestHandlerSelectors.basePackage(&quot;com.perfect.bcs.web&quot;));</span>
+<span class="fc" id="L55">        apiSelectorBuilder.paths(PathSelectors.any());</span>
+
+<span class="fc" id="L57">        return apiSelectorBuilder.build();</span>
+
+    }
+
+    private ApiInfo apiInfo() {
+
+<span class="fc" id="L63">        return new ApiInfoBuilder()</span>
+            // 大标题
+<span class="fc" id="L65">            .title(&quot;接口&quot;)</span>
+            // 描述
+<span class="fc" id="L67">            .description(&quot;接口文档&quot;)</span>
+<span class="fc" id="L68">            .termsOfServiceUrl(&quot;https://www.perfect.com&quot;).</span>
+            // 联系人
+<span class="fc" id="L70">                contact(new Contact(&quot;梁波&quot;, &quot;&quot;, &quot;perfect5085@163.com&quot;))</span>
+            // 版本
+<span class="fc" id="L72">            .version(&quot;1.0&quot;)</span>
+<span class="fc" id="L73">            .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

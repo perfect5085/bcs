@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationInfoRunner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.web</a> &gt; <span class="el_source">ApplicationInfoRunner.java</span></div><h1>ApplicationInfoRunner.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.web;
+
+import ch.qos.logback.classic.Logger;
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+<span class="fc" id="L27">@Slf4j</span>
+@Component
+@Order(value = 2)
+<span class="fc" id="L30">public class ApplicationInfoRunner implements ApplicationRunner, Ordered {</span>
+
+    @Autowired
+    Environment environment;
+
+    @Autowired
+    ApplicationContext applicationContext;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+
+<span class="fc" id="L41">        String serverPort = environment.getProperty(&quot;local.server.port&quot;);</span>
+
+<span class="fc" id="L43">        BuildProperties buildProperties = applicationContext.getBean(BuildProperties.class);</span>
+<span class="fc" id="L44">        Instant instant = buildProperties.getTime();</span>
+        String buildTimeStr;
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        if (instant != null) {</span>
+<span class="fc" id="L47">            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneOffset.ofHours(8)); // 切换到GMT8区时间</span>
+<span class="fc" id="L48">            buildTimeStr = LocalDateTimeUtil.format(localDateTime, &quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+<span class="fc" id="L49">        } else {</span>
+<span class="nc" id="L50">            buildTimeStr = &quot;无法获取Jar包的编译打包时间！！！&quot;;</span>
+        }
+
+<span class="fc" id="L53">        log.info(&quot;================================&quot;);</span>
+<span class="fc" id="L54">        log.info(&quot;================================&quot;);</span>
+<span class="fc" id="L55">        log.info(StrUtil.format(&quot;===  应用启动环境   === {}&quot;, ObjectUtil.toString(environment.getActiveProfiles())));</span>
+<span class="fc" id="L56">        log.info(StrUtil.format(&quot;===  应用启动端口   === {}&quot;, serverPort));</span>
+<span class="fc" id="L57">        log.info(StrUtil.format(&quot;===  Jar编译打包时间=== {}&quot;, buildTimeStr));</span>
+<span class="fc" id="L58">        log.info(&quot;================================&quot;);</span>
+<span class="fc" id="L59">        log.info(&quot;================================&quot;);</span>
+<span class="fc" id="L60">        log.info(&quot;===  Spring_Boot_Success!!!  ===&quot;);</span>
+
+        // 判断是否在 jvm 启动参数中明确关闭控制台日志输出
+<span class="fc" id="L63">        String closeFlag = System.getProperty(&quot;close-console-log-flag&quot;);</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (BooleanUtil.toBoolean(closeFlag)) {</span>
+<span class="nc" id="L65">            Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);</span>
+<span class="nc" id="L66">            rootLogger.detachAppender(&quot;console&quot;);</span>
+        }
+<span class="fc" id="L68">    }</span>
+
+    @Override
+    public int getOrder() {
+<span class="nc" id="L72">        return Integer.MIN_VALUE + 10000;</span>
+    }
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

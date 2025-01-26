@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BalanceRestController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.web.controller</a> &gt; <span class="el_source">BalanceRestController.java</span></div><h1>BalanceRestController.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.web.controller;
+
+import cn.hutool.core.util.NumberUtil;
+import com.perfect.bcs.biz.BalanceManageService;
+import com.perfect.bcs.web.controller.common.CommonController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import java.math.BigDecimal;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+@Api(tags = &quot;账户余额管理&quot;)
+@RestController
+@RequestMapping(value = &quot;/open/balance&quot;, produces = &quot;application/json&quot;)
+<span class="fc" id="L32">@Slf4j</span>
+@Validated
+<span class="fc" id="L34">public class BalanceRestController extends CommonController {</span>
+
+    @Autowired
+    private BalanceManageService balanceManageService;
+
+    @ApiOperation(value = &quot;查看账户余额&quot;)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = &quot;accountNo&quot;, value = &quot;账户Id&quot;, required = true) })
+    @GetMapping(value = &quot;/get-by-account&quot;)
+    public BigDecimal get(@RequestParam @NotBlank String accountNo) throws Throwable {
+
+<span class="fc" id="L45">        return balanceManageService.getBalance(accountNo);</span>
+    }
+
+    @ApiOperation(value = &quot;取钱（扣款）&quot;)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = &quot;transactionId&quot;, value = &quot;交易ID，每次交易ID必须唯一，重复交易ID只执行一次&quot;, required = true),
+            @ApiImplicitParam(name = &quot;accountNo&quot;, value = &quot;账户Id&quot;, required = true),
+            @ApiImplicitParam(name = &quot;amount&quot;, value = &quot;取钱数目，单位元，精确到分。取钱不能是负数&quot;, required = true), })
+    @PostMapping(value = &quot;/withdraw-by-account&quot;)
+    public void withdraw(@NotBlank String transactionId,
+                         @NotBlank String accountNo,
+                         @NotNull
+                         @DecimalMin(value = &quot;0&quot;, message = &quot;取款金额不能为负数！&quot;)
+                         @DecimalMax(value = &quot;1000000&quot;, message = &quot;一次取款金额不能超过100万元！&quot;)
+                         @Digits(integer = 7, fraction = 2, message = &quot;金额精确到分，小数点后2位！&quot;)
+                         BigDecimal amount)
+            throws Throwable {
+
+<span class="fc" id="L63">        balanceManageService.changeBalance(transactionId, accountNo, NumberUtil.mul(amount, new BigDecimal(&quot;-1&quot;)));</span>
+<span class="fc" id="L64">    }</span>
+
+    @ApiOperation(value = &quot;存钱&quot;)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = &quot;transactionId&quot;, value = &quot;交易ID，每次交易ID必须唯一，重复交易ID只执行一次&quot;, required = true),
+            @ApiImplicitParam(name = &quot;accountNo&quot;, value = &quot;账户Id&quot;, required = true),
+            @ApiImplicitParam(name = &quot;amount&quot;, value = &quot;存钱数目，单位元，精确到分。存钱不能是负数&quot;, required = true), })
+    @PostMapping(value = &quot;/deposit-by-account&quot;)
+    public void deposit(@NotBlank String transactionId,
+                        @NotBlank String accountNo,
+                        @NotNull
+                        @DecimalMin(value = &quot;0&quot;, message = &quot;存款金额不能为负数！&quot;)
+                        @DecimalMax(value = &quot;1000000&quot;, message = &quot;一次存款金额不能超过100万元！&quot;)
+                        @Digits(integer = 7, fraction = 2, message = &quot;金额精确到分，小数点后2位！&quot;)
+                        BigDecimal amount) throws Throwable {
+
+<span class="fc" id="L80">        balanceManageService.changeBalance(transactionId, accountNo, amount);</span>
+
+<span class="fc" id="L82">    }</span>
+
+    @ApiOperation(value = &quot;两个账户之间转账：从来源账户转账到目标账户&quot;)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = &quot;transactionId&quot;, value = &quot;交易ID，每次交易ID必须唯一，重复交易ID只执行一次&quot;, required = true),
+            @ApiImplicitParam(name = &quot;sourceAccountNo&quot;, value = &quot;来源账户Id&quot;, required = true),
+            @ApiImplicitParam(name = &quot;targetAccountNo&quot;, value = &quot;目标账户Id&quot;, required = true),
+            @ApiImplicitParam(name = &quot;amount&quot;, value = &quot;转账数目，单位元，精确到分。转账不能是负数&quot;, required = true), })
+    @PostMapping(value = &quot;/source-transfer-target&quot;)
+    public void transfer(@NotBlank String transactionId,
+                         @NotBlank String sourceAccountNo,
+                         @NotBlank String targetAccountNo,
+                         @NotNull
+                         @DecimalMin(value = &quot;0&quot;, message = &quot;转账金额不能为负数！&quot;)
+                         @DecimalMax(value = &quot;1000000&quot;, message = &quot;一次转账金额不能超过100万元！&quot;)
+                         @Digits(integer = 7, fraction = 2, message = &quot;金额精确到分，小数点后2位！&quot;)
+                         BigDecimal amount) throws Throwable {
+
+<span class="fc" id="L100">        balanceManageService.transferBalance(transactionId, sourceAccountNo, targetAccountNo, amount);</span>
+<span class="fc" id="L101">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

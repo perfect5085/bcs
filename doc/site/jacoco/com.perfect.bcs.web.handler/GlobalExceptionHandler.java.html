@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.web.handler</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.web.handler;
+
+import cn.hutool.core.util.StrUtil;
+import com.perfect.bcs.biz.common.BizException;
+import com.perfect.bcs.web.controller.common.ResultVO;
+import com.perfect.bcs.web.util.RequestUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+/**
+ * 全局默认异常处理类
+ *
+ * @author liangbo 梁波
+ * @date 2025-01-22 22:37
+ */
+@ControllerAdvice
+<span class="fc" id="L28">public class GlobalExceptionHandler {</span>
+
+<span class="fc" id="L30">    private static final Logger logger    = LoggerFactory.getLogger(GlobalExceptionHandler.class);</span>
+<span class="fc" id="L31">    private static final Logger bizLogger = LoggerFactory.getLogger(&quot;bizErrorLogger&quot;);</span>
+
+    @Autowired
+    private MessageSource messageSource;
+
+    @ExceptionHandler(Throwable.class)
+    @ResponseBody
+    public ResultVO defaultExceptionHandler(HttpServletRequest request, Throwable e) {
+
+<span class="nc" id="L40">        ResultVO jsonResult = new ResultVO(RequestUtil.getRequestId(request));</span>
+<span class="nc" id="L41">        logger.error(&quot;System_error:requestId=&quot; + jsonResult.getRequestId(), e);</span>
+<span class="nc" id="L42">        jsonResult.setCode(-1);</span>
+<span class="nc" id="L43">        jsonResult.setMessage(messageSource.getMessage(&quot;-1&quot;, null, request.getLocale()));</span>
+<span class="nc" id="L44">        jsonResult.setErrorMessage(e.getMessage());</span>
+
+<span class="nc" id="L46">        return jsonResult;</span>
+    }
+
+    @ExceptionHandler(BizException.class)
+    @ResponseBody
+    public ResultVO defaultBizExcetionHandler(HttpServletRequest request, BizException e) {
+
+<span class="nc" id="L53">        ResultVO jsonResult = new ResultVO();</span>
+<span class="nc" id="L54">        String msg = MessageFormatter.format(&quot;BizErrorCode= {} RequestId= {}&quot;, e.getCode(), jsonResult.getRequestId())</span>
+<span class="nc" id="L55">                                     .getMessage();</span>
+<span class="nc" id="L56">        bizLogger.error(msg, e);</span>
+
+<span class="nc" id="L58">        jsonResult.setCode(e.getCode());</span>
+<span class="nc" id="L59">        jsonResult.setMessage(messageSource.getMessage(String.valueOf(e.getCode()), e.getArgs(), request.getLocale()));</span>
+<span class="nc" id="L60">        jsonResult.setErrorMessage(e.getMessage());</span>
+
+<span class="nc" id="L62">        return jsonResult;</span>
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public ResultVO defaultConstraintViolationException(HttpServletRequest request, ConstraintViolationException e) {
+
+<span class="nc" id="L69">        ResultVO jsonResult = new ResultVO();</span>
+<span class="nc" id="L70">        logger.error(&quot;System_error:requestId=&quot; + jsonResult.getRequestId(), e);</span>
+
+<span class="nc" id="L72">        int code = -2;</span>
+<span class="nc" id="L73">        jsonResult.setCode(code);</span>
+<span class="nc" id="L74">        jsonResult.setMessage(messageSource.getMessage(String.valueOf(code), null, request.getLocale()));</span>
+
+<span class="nc" id="L76">        String message = e.getMessage();</span>
+<span class="nc" id="L77">        int index = StrUtil.indexOf(message, '.');</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (index &gt;= 0) {</span>
+<span class="nc" id="L79">            message = StrUtil.subSuf(message, index + 1);</span>
+        }
+<span class="nc" id="L81">        jsonResult.setErrorMessage(&quot;参数校验失败:&quot; + message);</span>
+
+<span class="nc" id="L83">        return jsonResult;</span>
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public ResultVO defaultMethodArgumentNotValidException(HttpServletRequest request,
+                                                           MethodArgumentNotValidException e) {
+
+<span class="nc" id="L91">        ResultVO jsonResult = new ResultVO();</span>
+<span class="nc" id="L92">        logger.error(&quot;System_error:requestId=&quot; + jsonResult.getRequestId(), e);</span>
+
+<span class="nc" id="L94">        int code = -2;</span>
+<span class="nc" id="L95">        jsonResult.setCode(code);</span>
+<span class="nc" id="L96">        jsonResult.setMessage(messageSource.getMessage(String.valueOf(code), null, request.getLocale()));</span>
+
+<span class="nc" id="L98">        BindingResult bindingResult = e.getBindingResult();</span>
+<span class="nc" id="L99">        StringBuilder sb = new StringBuilder(&quot;参数校验失败:&quot;);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        for (FieldError fieldError : bindingResult.getFieldErrors()) {</span>
+<span class="nc" id="L101">            sb.append(fieldError.getField()).append(&quot;:&quot;).append(fieldError.getDefaultMessage()).append(&quot;,&quot;);</span>
+<span class="nc" id="L102">        }</span>
+<span class="nc" id="L103">        String msg = sb.toString();</span>
+<span class="nc" id="L104">        msg = msg.substring(0, msg.length() - 1);</span>
+<span class="nc" id="L105">        jsonResult.setErrorMessage(msg);</span>
+
+<span class="nc" id="L107">        return jsonResult;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

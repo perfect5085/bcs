@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BalanceManageService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.biz</a> &gt; <span class="el_source">BalanceManageService.java</span></div><h1>BalanceManageService.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.biz;
+
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.perfect.bcs.biz.common.BizException;
+import com.perfect.bcs.biz.type.AccountStatus;
+import com.perfect.bcs.biz.type.TransactionStatus;
+import com.perfect.bcs.dal.domain.AccountInfoDO;
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author liangbo 梁波
+ * @date 2025-01-22 21:45
+ */
+@Service
+<span class="fc" id="L25">@Slf4j</span>
+<span class="fc" id="L26">public class BalanceManageService {</span>
+
+    @Autowired
+    private AccountInfoService          accountInfoService;
+    @Autowired
+    private AccountTransactionService   accountTransactionService;
+    @Autowired
+    private AccountBalanceChangeService accountBalanceChangeService;
+    @Autowired
+    private BalanceAtomicService        balanceAtomicService;
+    @Autowired
+    private CacheService                cacheService;
+    @Autowired
+    private RedissonClient              redissonClient;
+
+    /**
+     * 账户信息缓存Key前缀
+     */
+    private static final String CACHE_KEY_ACCOUNT_INFO_PREFIX = &quot;acc_info_get_&quot;;
+
+    /**
+     * 交易缓存的前缀
+     */
+    private static final String CACHE_KEY_ACCOUNT_BALANCE_TRANSACTION_PREFIX = &quot;acc_blc_t_v&quot;;
+
+    /**
+     * 交易分布锁的前缀
+     */
+    private static final String LOCK_KEY_ACCOUNT_BALANCE_TRANSACTION_PREFIX = &quot;acc_blc_t_l&quot;;
+
+    /**
+     * 获取账户余额
+     *
+     * @param accountNo 账户
+     * @return
+     */
+    public BigDecimal getBalance(String accountNo) {
+
+<span class="fc" id="L64">        AccountInfoDO accountInfoDO = getAccountInfo(accountNo);</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (null == accountInfoDO) {</span>
+<span class="nc" id="L66">            throw new BizException(1000, accountNo);</span>
+        }
+
+<span class="fc" id="L69">        return Optional.ofNullable(accountInfoDO)</span>
+<span class="fc" id="L70">                       .map(AccountInfoDO::getAccountBalance)</span>
+<span class="fc" id="L71">                       .orElse(null);</span>
+    }
+
+    /**
+     * 修改账户的余额【取款/存钱】
+     *
+     * @param transactionId 事务ID
+     * @param accountNo     账户
+     * @param amount        修改金额： 正数【取款】，负数【存钱】
+     */
+    public void changeBalance(String transactionId, String accountNo, BigDecimal amount) {
+
+<span class="fc" id="L83">        checkTransaction(transactionId);</span>
+<span class="fc" id="L84">        boolean flag = accountTransactionService.create(transactionId, &quot;&quot;, accountNo, amount);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (!flag) {</span>
+<span class="nc" id="L86">            throw new BizException(1004, transactionId);</span>
+        }
+
+<span class="fc" id="L89">        AccountInfoDO accountInfoDO = getAccountInfo(accountNo);</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">        if (null == accountInfoDO) {</span>
+<span class="nc" id="L91">            throw new BizException(1000, accountNo);</span>
+        }
+
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        if (!AccountStatus.ACTIVE.equals(accountInfoDO.getAccountStatus())) {</span>
+<span class="nc" id="L95">            throw new BizException(1001, accountNo);</span>
+        }
+
+<span class="fc" id="L98">        String lockKey = getLockKeyAccountBalanceTransaction(transactionId);</span>
+<span class="fc" id="L99">        RLock lock = redissonClient.getLock(lockKey);</span>
+
+        try {
+            // 尝试在10秒之内获取锁， 手动指定过期时间为 30 秒
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {</span>
+<span class="fc" id="L104">                boolean isSuccess = false;</span>
+                // 最多重试3次
+<span class="fc" id="L106">                int retryIndex = 3;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">                while (retryIndex &gt; 0) {</span>
+<span class="fc" id="L108">                    retryIndex--;</span>
+                    try {
+                        // 扣款（取款）操作
+<span class="fc bfc" id="L111" title="All 2 branches covered.">                        if (NumberUtil.isLess(amount, BigDecimal.ZERO)) {</span>
+<span class="fc" id="L112">                            withdraw(accountInfoDO, transactionId, amount);</span>
+                        } else {
+                            // 存钱操作
+<span class="fc" id="L115">                            deposite(accountInfoDO, transactionId, amount);</span>
+                        }
+
+<span class="fc" id="L118">                        isSuccess = true;</span>
+<span class="fc" id="L119">                        break;</span>
+<span class="fc" id="L120">                    } catch (Throwable e) {</span>
+<span class="fc" id="L121">                        log.error(&quot;存钱/取钱异常&quot;, e);</span>
+                        // 很有可能数据不是最新的，更新一下最新的数据
+<span class="fc" id="L123">                        accountInfoDO = refreshAccountInfo(accountNo);</span>
+<span class="fc" id="L124">                        Thread.sleep(RandomUtil.randomInt(500, 3000));</span>
+<span class="fc" id="L125">                    }</span>
+                }
+<span class="fc bfc" id="L127" title="All 2 branches covered.">                if (!isSuccess) {</span>
+<span class="fc" id="L128">                    accountTransactionService.end(transactionId, TransactionStatus.FAILED);</span>
+<span class="fc" id="L129">                    throw new BizException(1002);</span>
+                } else {
+                    // 更新缓存余额
+<span class="fc" id="L132">                    refreshAccountInfo(accountNo);</span>
+                }
+            }
+<span class="fc" id="L135">        } catch (Throwable e) {</span>
+<span class="fc" id="L136">            log.error(&quot;修改账户余额异常！&quot;, e);</span>
+<span class="fc" id="L137">            throw new BizException(1002);</span>
+        } finally {
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">            if (lock.isHeldByCurrentThread()) {</span>
+<span class="fc" id="L140">                lock.unlock();</span>
+            }
+        }
+
+<span class="fc" id="L144">    }</span>
+
+    /**
+     * 账户之间转账
+     *
+     * @param transactionId   事务ID
+     * @param sourceAccountNo 来源账户
+     * @param targetAccountNo 目标账户
+     * @param amount          从来源账户转给目标账户的金额：不能为负数
+     */
+    public void transferBalance(String transactionId, String sourceAccountNo,
+                                String targetAccountNo, BigDecimal amount) {
+
+<span class="fc" id="L157">        checkTransaction(transactionId);</span>
+<span class="fc" id="L158">        boolean flag = accountTransactionService.create(transactionId, sourceAccountNo, targetAccountNo, amount);</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        if (!flag) {</span>
+<span class="nc" id="L160">            throw new BizException(1004, transactionId);</span>
+        }
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (StrUtil.equals(sourceAccountNo, targetAccountNo)) {</span>
+<span class="fc" id="L163">            throw new BizException(1005, sourceAccountNo);</span>
+        }
+
+<span class="fc" id="L166">        AccountInfoDO sourceAccountInfoDO = getAccountInfo(sourceAccountNo);</span>
+<span class="fc" id="L167">        AccountInfoDO targetAccountInfoDO = getAccountInfo(targetAccountNo);</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">        if (null == sourceAccountInfoDO) {</span>
+<span class="nc" id="L169">            throw new BizException(1000, sourceAccountNo);</span>
+        }
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">        if (null == targetAccountInfoDO) {</span>
+<span class="nc" id="L172">            throw new BizException(1000, targetAccountNo);</span>
+        }
+
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">        if (!AccountStatus.ACTIVE.equals(sourceAccountInfoDO.getAccountStatus())) {</span>
+<span class="nc" id="L176">            throw new BizException(1001, sourceAccountNo);</span>
+        }
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">        if (!AccountStatus.ACTIVE.equals(targetAccountInfoDO.getAccountStatus())) {</span>
+<span class="nc" id="L179">            throw new BizException(1001, targetAccountNo);</span>
+        }
+
+<span class="fc" id="L182">        String lockKey = getLockKeyAccountBalanceTransaction(transactionId);</span>
+<span class="fc" id="L183">        RLock lock = redissonClient.getLock(lockKey);</span>
+        try {
+            // 尝试在10秒之内获取锁， 手动指定过期时间为 30 秒
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {</span>
+
+                // 最多重试3次
+<span class="fc" id="L189">                int retryIndex = 3;</span>
+<span class="fc" id="L190">                boolean isSuccess = false;</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">                while (retryIndex &gt; 0) {</span>
+<span class="fc" id="L192">                    retryIndex--;</span>
+                    try {
+
+<span class="fc" id="L195">                        balanceAtomicService.transferBalance(sourceAccountInfoDO, targetAccountInfoDO,</span>
+                                                             transactionId,
+                                                             amount);
+<span class="fc" id="L198">                        isSuccess = true;</span>
+<span class="fc" id="L199">                        break;</span>
+
+<span class="fc" id="L201">                    } catch (Throwable e) {</span>
+<span class="fc" id="L202">                        log.error(&quot;转账异常&quot;, e);</span>
+                        // 很有可能数据不是最新的，更新一下最新的数据
+<span class="fc" id="L204">                        sourceAccountInfoDO = refreshAccountInfo(sourceAccountNo);</span>
+<span class="fc" id="L205">                        targetAccountInfoDO = refreshAccountInfo(targetAccountNo);</span>
+<span class="fc" id="L206">                        Thread.sleep(RandomUtil.randomInt(500, 3000));</span>
+<span class="fc" id="L207">                    }</span>
+                }
+
+<span class="fc bfc" id="L210" title="All 2 branches covered.">                if (!isSuccess) {</span>
+<span class="fc" id="L211">                    accountTransactionService.end(transactionId, TransactionStatus.FAILED);</span>
+<span class="fc" id="L212">                    throw new BizException(1002);</span>
+                } else {
+                    // 更新缓存余额
+<span class="fc" id="L215">                    refreshAccountInfo(sourceAccountNo);</span>
+<span class="fc" id="L216">                    refreshAccountInfo(targetAccountNo);</span>
+                }
+
+            }
+<span class="fc" id="L220">        } catch (Throwable e) {</span>
+<span class="fc" id="L221">            log.error(&quot;转账异常！&quot;, e);</span>
+<span class="fc" id="L222">            throw new BizException(1002);</span>
+        } finally {
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">            if (lock.isHeldByCurrentThread()) {</span>
+<span class="fc" id="L225">                lock.unlock();</span>
+            }
+        }
+<span class="fc" id="L228">    }</span>
+
+    /**
+     * 存钱
+     *
+     * @param accountInfoDO 账户
+     * @param transactionId 事务ID
+     * @param amount        金额
+     */
+    private void deposite(AccountInfoDO accountInfoDO, String transactionId, BigDecimal amount) {
+
+<span class="fc" id="L239">        balanceAtomicService.changeBalance(accountInfoDO, transactionId, amount);</span>
+<span class="fc" id="L240">    }</span>
+
+    /**
+     * 取钱
+     *
+     * @param accountInfoDO 账户
+     * @param transactionId 事务ID
+     * @param amount        金额
+     */
+    private void withdraw(AccountInfoDO accountInfoDO, String transactionId, BigDecimal amount) {
+<span class="fc" id="L250">        BigDecimal accountBalance = accountInfoDO.getAccountBalance();</span>
+
+<span class="fc" id="L252">        BigDecimal newBalance = NumberUtil.add(accountBalance, amount);</span>
+        // 取款的数额大于账户的余额
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">        if (NumberUtil.isLess(newBalance, BigDecimal.ZERO)) {</span>
+            // 主动刷新一下余额，防止缓存数据不及时
+<span class="nc" id="L256">            accountInfoDO = refreshAccountInfo(accountInfoDO.getAccountNo());</span>
+<span class="nc" id="L257">            accountBalance = accountInfoDO.getAccountBalance();</span>
+<span class="nc" id="L258">            newBalance = NumberUtil.add(accountBalance, amount);</span>
+        }
+
+        // 取款的数额大于账户的余额，抛出异常
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">        if (NumberUtil.isLess(newBalance, BigDecimal.ZERO)) {</span>
+
+<span class="nc" id="L264">            accountTransactionService.end(transactionId, TransactionStatus.FAILED);</span>
+
+<span class="nc" id="L266">            throw new BizException(1003, accountInfoDO.getAccountNo());</span>
+        } else {
+<span class="fc" id="L268">            balanceAtomicService.changeBalance(accountInfoDO, transactionId, amount);</span>
+        }
+<span class="fc" id="L270">    }</span>
+
+    /**
+     * 检测当前事务是否正在执行
+     *
+     * @param transactionId
+     */
+    private void checkTransaction(String transactionId) {
+<span class="fc" id="L278">        String key = getCacheKeyAccountBalanceTransaction(transactionId);</span>
+<span class="fc" id="L279">        String transactionFlag = cacheService.get(key);</span>
+<span class="pc bpc" id="L280" title="1 of 2 branches missed.">        if (StrUtil.isNotBlank(transactionFlag)) {</span>
+<span class="nc" id="L281">            throw new BizException(1004, transactionId);</span>
+        }
+
+        // 缓存交易60秒，防止短时间重复提交
+<span class="fc" id="L285">        cacheService.set(key, &quot;1&quot;, 60);</span>
+<span class="fc" id="L286">    }</span>
+
+    /**
+     * 获取账户信息
+     *
+     * @param accountNo 账户
+     * @return
+     */
+    private AccountInfoDO getAccountInfo(String accountNo) {
+<span class="fc" id="L295">        String cacheKey = getCacheKeyAccountInfo(accountNo);</span>
+<span class="fc" id="L296">        String accountInfoStr = cacheService.get(cacheKey);</span>
+
+<span class="fc bfc" id="L298" title="All 2 branches covered.">        if (StrUtil.isBlank(accountInfoStr)) {</span>
+<span class="fc" id="L299">            return refreshAccountInfo(accountNo);</span>
+        }
+<span class="fc" id="L301">        return JSONUtil.toBean(accountInfoStr, AccountInfoDO.class);</span>
+    }
+
+    /**
+     * 强制刷新缓存
+     *
+     * @param accountNo 账户
+     * @return
+     */
+    private AccountInfoDO refreshAccountInfo(String accountNo) {
+
+<span class="fc" id="L312">        AccountInfoDO accountInfoDO = accountInfoService.getByAccountNo(accountNo);</span>
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">        if (null == accountInfoDO) {</span>
+<span class="nc" id="L314">            throw new BizException(1000, accountNo);</span>
+        }
+
+<span class="fc" id="L317">        String cacheKey = getCacheKeyAccountInfo(accountNo);</span>
+<span class="fc" id="L318">        String accountInfoStr = JSONUtil.toJsonStr(accountInfoDO);</span>
+        // 更新缓存
+<span class="fc" id="L320">        cacheService.set(cacheKey, accountInfoStr, 180);</span>
+
+<span class="fc" id="L322">        return accountInfoDO;</span>
+    }
+
+    private String getCacheKeyAccountInfo(String accountNo) {
+<span class="fc" id="L326">        return CACHE_KEY_ACCOUNT_INFO_PREFIX + accountNo;</span>
+    }
+
+    private String getLockKeyAccountBalanceTransaction(String transactionId) {
+<span class="fc" id="L330">        return LOCK_KEY_ACCOUNT_BALANCE_TRANSACTION_PREFIX + transactionId;</span>
+    }
+
+    private String getCacheKeyAccountBalanceTransaction(String transactionId) {
+<span class="fc" id="L334">        return CACHE_KEY_ACCOUNT_BALANCE_TRANSACTION_PREFIX + transactionId;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

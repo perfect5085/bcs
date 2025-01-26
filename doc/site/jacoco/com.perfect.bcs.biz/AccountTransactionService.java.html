@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccountTransactionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.biz</a> &gt; <span class="el_source">AccountTransactionService.java</span></div><h1>AccountTransactionService.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.biz;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.perfect.bcs.biz.type.TransactionStatus;
+import com.perfect.bcs.dal.domain.AccountTransactionDO;
+import com.perfect.bcs.dal.mapper.AccountTransactionMapper;
+import java.math.BigDecimal;
+import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author liangbo 梁波
+ * @date 2024-02-01 15:40
+ */
+@Service
+<span class="fc" id="L17">@Slf4j</span>
+<span class="fc" id="L18">public class AccountTransactionService extends ServiceImpl&lt;AccountTransactionMapper, AccountTransactionDO&gt; {</span>
+
+    public AccountTransactionDO get(String transactionId) {
+
+<span class="fc" id="L22">        return lambdaQuery().eq(AccountTransactionDO::getTransactionId, transactionId)</span>
+<span class="fc" id="L23">                            .one();</span>
+    }
+
+    public boolean create(String transactionId, String sourceAccountNo, String targetAccountNo,
+                          BigDecimal transactionAmount) {
+
+        try {
+<span class="fc" id="L30">            AccountTransactionDO transactionDO = new AccountTransactionDO()</span>
+<span class="fc" id="L31">                    .setTransactionId(transactionId)</span>
+<span class="fc" id="L32">                    .setSourceAccountNo(sourceAccountNo)</span>
+<span class="fc" id="L33">                    .setTargetAccountNo(targetAccountNo)</span>
+<span class="fc" id="L34">                    .setTransactionAmount(transactionAmount)</span>
+<span class="fc" id="L35">                    .setTransactionStartTime(new Date())</span>
+<span class="fc" id="L36">                    .setTransactionStatus(TransactionStatus.STARTED);</span>
+
+<span class="fc" id="L38">            return save(transactionDO);</span>
+        } // 通过 transactionId 的唯一性，来避免交易的重复执行。
+        // 重复执行，会抛出异常，具体的异常依赖于底层的框架
+<span class="fc" id="L41">        catch (Throwable e) {</span>
+<span class="fc" id="L42">            log.error(&quot;创建交易异常&quot;, e);</span>
+<span class="fc" id="L43">            return false;</span>
+        }
+    }
+
+    public boolean end(String transactionId, String transactionStatus) {
+
+<span class="fc" id="L49">        return lambdaUpdate().eq(AccountTransactionDO::getTransactionId, transactionId)</span>
+<span class="fc" id="L50">                             .set(AccountTransactionDO::getTransactionEndTime, new Date())</span>
+<span class="fc" id="L51">                             .set(AccountTransactionDO::getTransactionStatus, transactionStatus)</span>
+<span class="fc" id="L52">                             .update();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

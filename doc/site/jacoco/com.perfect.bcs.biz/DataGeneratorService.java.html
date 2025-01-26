@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataGeneratorService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bcs-web</a> &gt; <a href="index.source.html" class="el_package">com.perfect.bcs.biz</a> &gt; <span class="el_source">DataGeneratorService.java</span></div><h1>DataGeneratorService.java</h1><pre class="source lang-java linenums">package com.perfect.bcs.biz;
+
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
+import com.perfect.bcs.biz.type.AccountStatus;
+import com.perfect.bcs.biz.util.MockDataUtil;
+import com.perfect.bcs.dal.domain.AccountInfoDO;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author liangbo 梁波
+ * @date 2024-02-01 15:40
+ */
+@Service
+<span class="fc" id="L20">@Slf4j</span>
+<span class="fc" id="L21">public class DataGeneratorService {</span>
+
+    @Autowired
+    private AccountInfoService          accountInfoService;
+    @Autowired
+    private AccountTransactionService   accountTransactionService;
+    @Autowired
+    private AccountBalanceChangeService accountBalanceChangeService;
+
+    private static final String BANK_CODE = &quot;621661&quot;;
+
+    public void generateAccounts(int count) {
+<span class="nc" id="L33">        List&lt;AccountInfoDO&gt; accountList = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L35">        int batchSize = 1000;</span>
+
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (int i = 0; i &lt; count; i++) {</span>
+<span class="nc" id="L38">            accountList.clear();</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">            for (int j = 0; j &lt; batchSize; j++) {</span>
+<span class="nc" id="L40">                long accountLong = RandomUtil.randomLong(1000000000000L, 9999999999999L);</span>
+
+<span class="nc" id="L42">                String accountNo = BANK_CODE + accountLong;</span>
+<span class="nc" id="L43">                BigDecimal balance = RandomUtil.randomBigDecimal(BigDecimal.ZERO, new BigDecimal(&quot;1000000.00&quot;));</span>
+
+<span class="nc" id="L45">                int statusInt = RandomUtil.randomInt(0, 100);</span>
+<span class="nc" id="L46">                String status = AccountStatus.ACTIVE;</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">                if (1 == statusInt) {</span>
+<span class="nc" id="L48">                    status = AccountStatus.FROZEN;</span>
+                }
+<span class="nc bnc" id="L50" title="All 2 branches missed.">                if (2 == statusInt) {</span>
+<span class="nc" id="L51">                    status = AccountStatus.INACTIVE;</span>
+                }
+
+<span class="nc" id="L54">                AccountInfoDO accountInfoDO = new AccountInfoDO()</span>
+<span class="nc" id="L55">                        .setAccountNo(accountNo)</span>
+<span class="nc" id="L56">                        .setAccountName(MockDataUtil.getName())</span>
+<span class="nc" id="L57">                        .setAccountBalance(balance)</span>
+<span class="nc" id="L58">                        .setAccountNote(&quot;&quot;)</span>
+<span class="nc" id="L59">                        .setAccountStatus(status)</span>
+<span class="nc" id="L60">                        .setDataVersion(IdUtil.fastSimpleUUID());</span>
+<span class="nc" id="L61">                accountList.add(accountInfoDO);</span>
+            }
+
+            try {
+<span class="nc" id="L65">                accountInfoService.saveBatch(accountList);</span>
+<span class="nc" id="L66">            } catch (Throwable e) {</span>
+<span class="nc" id="L67">                log.error(&quot;批量保存异常&quot;, e);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">                for (AccountInfoDO accountInfoDO : accountList) {</span>
+                    try {
+<span class="nc" id="L70">                        accountInfoService.save(accountInfoDO);</span>
+<span class="nc" id="L71">                    } catch (Throwable ex) {</span>
+<span class="nc" id="L72">                        log.error(&quot;单个保存异常&quot;, ex);</span>
+<span class="nc" id="L73">                    }</span>
+<span class="nc" id="L74">                }</span>
+<span class="nc" id="L75">            }</span>
+        }
+<span class="nc" id="L77">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
