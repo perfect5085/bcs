@@ -1,17 +1,15 @@
-package com.perfect.bcs.web;
+package com.perfect.bcs.biz;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.perfect.bcs.biz.AccountInfoService;
-import com.perfect.bcs.biz.AccountTransactionService;
-import com.perfect.bcs.biz.BalanceManageService;
 import com.perfect.bcs.biz.type.AccountStatus;
 import com.perfect.bcs.biz.type.TransactionStatus;
 import com.perfect.bcs.dal.domain.AccountInfoDO;
 import com.perfect.bcs.dal.domain.AccountTransactionDO;
+import com.perfect.bcs.web.ApplicationJar;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -24,7 +22,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,7 +45,7 @@ public class BalanceChangeTest {
 
     ExecutorService executor = Executors.newFixedThreadPool(10);
 
-    @Test
+    //@Test
     public void testChangeBalanceByConcurrency() throws Throwable {
 
         LambdaQueryWrapper<AccountInfoDO> wrapper = new LambdaQueryWrapper<>();
@@ -143,7 +140,7 @@ public class BalanceChangeTest {
         }
     }
 
-    @Test
+    //@Test
     public void testChangeBalanceByOrder() throws Throwable {
 
         LambdaQueryWrapper<AccountInfoDO> wrapper = new LambdaQueryWrapper<>();

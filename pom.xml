@@ -18,8 +18,6 @@
 
     <modules>
         <module>web</module>
-        <module>biz</module>
-        <module>dal</module>
     </modules>
 
 
@@ -220,6 +218,33 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--            </plugin>-->
+            <!-- JaCoCo 插件 -->
+<!--            <plugin>-->
+<!--                <groupId>org.jacoco</groupId>-->
+<!--                <artifactId>jacoco-maven-plugin</artifactId>-->
+<!--                <version>0.8.10</version> &lt;!&ndash; 使用最新版本 &ndash;&gt;-->
+<!--                <executions>-->
+<!--                    &lt;!&ndash; 默认生命周期绑定 &ndash;&gt;-->
+<!--                    <execution>-->
+<!--                        <id>prepare-agent</id>-->
+<!--                        <goals>-->
+<!--                            <goal>prepare-agent</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                    &lt;!&ndash; 生成测试覆盖率报告 &ndash;&gt;-->
+<!--                    <execution>-->
+<!--                        <id>report</id>-->
+<!--                        <phase>post-integration-test</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>report</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
