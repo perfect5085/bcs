@@ -28,8 +28,7 @@ BCS(Balance Calculation System)是一个实时余额计算系统。
 
 # 测试
 ## 功能测试
-1. 系统已经自动根据Swagger生成接口文档，详见： http://$IP:$Port/doc.html
-2. 搭建在ACK集群上的接口文档： http://8.130.178.136:9090/doc.html
+1. 使用Swagger生成的接口文档： http://8.130.178.124:9090/doc.html
 
 ## 性能测试
 1. 使用JMeter对系统进行压测，详见《性能测试报告》的Word文档。
