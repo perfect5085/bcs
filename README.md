@@ -40,3 +40,5 @@ BCS(Balance Calculation System)是一个实时余额计算系统。
 ## 集成测试
 1. 详见《系统集成测试报告》的Word文档。
 
+# 系统二期
+1. 详见《系统二期设计》的word文档。
