@@ -6,9 +6,11 @@ BCS(Balance Calculation System)是一个实时余额计算系统。
 * 对指定账户进行取款操作。
 * 对指定账户进行存款操作。
 * 将A账户的部分金额转移给B账户。
+* 查询交易的状态。
+* 重置超时交易
 
 # 系统介绍
-* 基于SpringBoot + PostgreSQL + Redis 的一个Web系统。
+* 基于SpringBoot + Mybatis-plus + MySQL + Redis 的一个Web系统。
 
 # 部署步骤
 1. 应用打包编译【忽略测试】 ： mvn clean install -Dmaven.test.skip
