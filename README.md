@@ -38,6 +38,7 @@ BCS(Balance Calculation System)是一个实时余额计算系统。
 
 ## 集成测试
 1. 详见《系统集成测试报告》的Word文档。
+2. 生成测试覆盖率报告： 在源码的web目录下执行：  1,  mvn clean test   2,  mvn jacoco:report
 
-# 系统二期
-1. 详见《系统二期设计》的word文档。
+# 系统二期【展望】
+1. 详见《系统二期设计【展望】》的word文档。
