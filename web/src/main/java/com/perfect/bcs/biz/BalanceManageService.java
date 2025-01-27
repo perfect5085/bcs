@@ -66,26 +66,36 @@ public class BalanceManageService {
      */
     private static final String LOCK_KEY_CHECK_TRANSACTION_STATUS = "che_tra_st";
 
+    private static boolean checkTaskFlag = false;
+
     /**
      * 定时检查交易是否超时，如果超时重置为失败
      */
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @Scheduled(cron = "0 0/5 * * * ?")
     @PostConstruct
-    public void checkTransactionStatus() {
+    public void resetTimeoutTransactionStatus() {
 
+        if (checkTaskFlag) {
+            log.info("定时检查交易是否超时任务结束（有任务在执行中，未结束）");
+            return;
+        }
+
+        checkTaskFlag = true;
+        log.info("定时检查交易是否超时任务开始");
         // 防止多个任务同时执行
-        RLock lock = redissonClient.getLock(LOCK_KEY_CHECK_TRANSACTION_STATUS);
+        RLock lock = null;
         try {
+            lock = redissonClient.getLock(LOCK_KEY_CHECK_TRANSACTION_STATUS);
             // 尝试在10秒之内获取锁， 手动指定过期时间为 600 秒
             if (lock.tryLock(10, 600, TimeUnit.SECONDS)) {
                 int pageIndex = 1;
                 int pageSize = 1000;
 
                 Date now = new Date();
-                // 向前推15分钟。
-                Date endDate = DateUtil.offsetMinute(now, -15);
-                // 向前推75分钟。
-                Date startDate = DateUtil.offsetMinute(now, -75);
+                // 向前推5分钟。
+                Date endDate = DateUtil.offsetMinute(now, -5);
+                // 向前推65分钟。
+                Date startDate = DateUtil.offsetMinute(now, -65);
 
                 while (true) {
                     Page<AccountTransactionDO> page =
@@ -100,7 +110,7 @@ public class BalanceManageService {
                     for (AccountTransactionDO record : page.getRecords()) {
                         try {
                             // 如果交易超过10分钟，也属于交易失败
-                            if (DateUtil.between(record.getTransactionStartTime(), new Date(), DateUnit.MINUTE) > 10) {
+                            if (DateUtil.between(record.getTransactionStartTime(), new Date(), DateUnit.SECOND) > 60) {
                                 accountTransactionService.end(record.getTransactionId(), TransactionStatus.FAILED);
                             }
                         } catch (Throwable e) {
@@ -113,7 +123,9 @@ public class BalanceManageService {
         } catch (Throwable e) {
             log.error("定时检查交易状态异常！", e);
         } finally {
-            if (lock.isHeldByCurrentThread()) {
+            log.info("定时检查交易是否超时任务结束");
+            checkTaskFlag = false;
+            if (null != lock && lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }

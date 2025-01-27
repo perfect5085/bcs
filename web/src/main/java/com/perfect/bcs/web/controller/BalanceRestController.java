@@ -63,6 +63,14 @@ public class BalanceRestController extends CommonController {
         return transactionDO.getTransactionStatus();
     }
 
+    @ApiOperation(value = "重置超时交易的状态")
+    @PostMapping(value = "/reset-timeout-transaction-status")
+    public void resetTimeoutTransactionStatus() throws Throwable {
+
+        balanceManageService.resetTimeoutTransactionStatus();
+
+    }
+
     @ApiOperation(value = "取钱（扣款）")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "transactionId", value = "交易ID，每次交易ID必须唯一，重复交易ID只执行一次", required = true),

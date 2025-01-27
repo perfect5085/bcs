@@ -57,6 +57,7 @@ public class AccountTransactionService extends ServiceImpl<AccountTransactionMap
     public boolean end(String transactionId, String transactionStatus) {
 
         return lambdaUpdate().eq(AccountTransactionDO::getTransactionId, transactionId)
+                             .eq(AccountTransactionDO::getTransactionStatus, TransactionStatus.STARTED)
                              .set(AccountTransactionDO::getTransactionEndTime, new Date())
                              .set(AccountTransactionDO::getTransactionStatus, transactionStatus)
                              .update();

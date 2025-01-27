@@ -43,6 +43,7 @@ public class BalanceAtomicService {
      */
     @Transactional(propagation = Propagation.REQUIRED,
             isolation = Isolation.READ_COMMITTED,
+            timeout = 60, // 超时设置为 60 秒，超过60秒回滚
             rollbackFor = Throwable.class)
     public void transferBalance(AccountInfoDO sourceAccountInfoDO, AccountInfoDO targetAccountInfoDO,
                                 String transactionId, BigDecimal amount) {
@@ -75,7 +76,7 @@ public class BalanceAtomicService {
 
         AccountTransactionDO transactionDO = accountTransactionService.get(transactionId);
         // 如果交易超过10分钟，也属于交易失败
-        if (DateUtil.between(transactionDO.getTransactionStartTime(), new Date(), DateUnit.MINUTE) > 10) {
+        if (DateUtil.between(transactionDO.getTransactionStartTime(), new Date(), DateUnit.SECOND) > 60) {
             accountTransactionService.end(transactionId, TransactionStatus.FAILED);
             throw new BizException(1006, transactionId);
         }
@@ -100,6 +101,7 @@ public class BalanceAtomicService {
      */
     @Transactional(propagation = Propagation.REQUIRED,
             isolation = Isolation.READ_COMMITTED,
+            timeout = 60, // 超时设置为 60 秒，超过60秒回滚
             rollbackFor = Throwable.class)
     public void changeBalance(AccountInfoDO accountInfoDO, String transactionId, BigDecimal amount) {
 
@@ -117,7 +119,7 @@ public class BalanceAtomicService {
 
         AccountTransactionDO transactionDO = accountTransactionService.get(transactionId);
         // 如果交易超过10分钟，也属于交易失败
-        if (DateUtil.between(transactionDO.getTransactionStartTime(), new Date(), DateUnit.MINUTE) > 10) {
+        if (DateUtil.between(transactionDO.getTransactionStartTime(), new Date(), DateUnit.SECOND) > 60) {
             accountTransactionService.end(transactionId, TransactionStatus.FAILED);
             throw new BizException(1006, transactionId);
         }
