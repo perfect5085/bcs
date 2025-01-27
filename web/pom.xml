@@ -15,16 +15,6 @@
 
     <dependencies>
 
-        <!--一方库-->
-<!--        <dependency>-->
-<!--            <groupId>com.perfect.bcs</groupId>-->
-<!--            <artifactId>bcs-biz</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.perfect.bcs</groupId>-->
-<!--            <artifactId>bcs-dal</artifactId>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>com.shuhong</groupId>
             <artifactId>common-shared-web-utils</artifactId>
